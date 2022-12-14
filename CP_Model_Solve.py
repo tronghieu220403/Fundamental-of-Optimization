@@ -8,7 +8,7 @@ def w(x="",end='\n'):
     fout.write(format(x))
     fout.write(end)
 
-fileIN = "data.txt"
+fileIN = "2.out"
 
 finp = open(fileIN,"r")
 
@@ -64,22 +64,11 @@ for i in range(nStu):
         if PrjData[i][j] < minMatchPrj:
             PrjData[i][j]= -999999
             PrjData[j][i]= -999999
-'''
-for i in range(nStu):
-    for j in range(i+1,nStu):
-        if PrjData[i][j] != PrjData[j][i]:
-            PrjData[i][j]= -999999
-            PrjData[j][i]= -999999 
-'''
+            
 print("LET'S START",flush=True)
 
 model = cp_model.CpModel()
-'''
-solver = pywraplp.Solver.CreateSolver('GLOP')
-if solver is None:
-    print('GLOP solver unavailable.')
-    exit()
-'''
+
 #set up cs: council + student
 cs = [[0 for _ in range(nStu)] for __ in range(nCouncil)]
 
@@ -87,17 +76,23 @@ for b in range(nCouncil):
     for i in range(nStu):
         cs[b][i] = model.NewBoolVar(f'cs_{b}_{i}')
 
+def cs_once():
+    #Once
+    for i in range(nStu):
+        model.Add( sum(cs[b][i] for b in range(nCouncil)) == 1)
+    return
+cs_once()
 
-#Once
-for i in range(nStu):
-    model.Add( sum(cs[b][i] for b in range(nCouncil)) == 1)
-
-#Number of project in a council >= minStu and <= maxStu
-for b in range(nCouncil):
-    model.Add( sum(cs[b][i] for i in range(nStu)) >= minStu)
+def cs_least_and_most():
+    #Number of project in a council >= minStu and <= maxStu
+    for b in range(nCouncil):
+        model.Add( sum(cs[b][i] for i in range(nStu)) >= minStu)
+        
+    for b in range(nCouncil):
+        model.Add( sum(cs[b][i] for i in range(nStu)) <= maxStu)
     
-for b in range(nCouncil):
-    model.Add( sum(cs[b][i] for i in range(nStu)) <= maxStu)
+    return
+cs_least_and_most()
 
 #set up ct: council + teacher
 ct = [[0 for _ in range(nProf)] for __ in range(nCouncil)]
@@ -105,14 +100,20 @@ for b in range(nCouncil):
     for t in range(nProf):
         ct[b][t] = model.NewBoolVar(f'ct_{b}_{t}')
 
-#Once
-for t in range(nProf):
-    model.Add(sum(ct[b][t] for b in range(nCouncil)) == 1)
+def ct_once():
+    #Once
+    for t in range(nProf):
+        model.Add(sum(ct[b][t] for b in range(nCouncil)) == 1)
+    return
+ct_once()
 
-#Number of teacher in a council >= minProf and <= maxProf:
-for b in range(nCouncil):
-    model.Add(sum(ct[b][t] for t in range(nProf)) >= minProf)
-    model.Add(sum(ct[b][t] for t in range(nProf)) <= maxProf)
+def ct_least_and_most():
+    #Number of teacher in a council >= minProf and <= maxProf:
+    for b in range(nCouncil):
+        model.Add(sum(ct[b][t] for t in range(nProf)) >= minProf)
+        model.Add(sum(ct[b][t] for t in range(nProf)) <= maxProf)
+    return
+ct_least_and_most()
 
 #set up ct: student + teacher
 st = [[0 for _ in range(nProf)] for __ in range(nStu)]
@@ -120,19 +121,26 @@ for i in range(nStu):
     for t in range(nProf):
         st[i][t] = model.NewBoolVar(f'st_{i}_{t}')
 
-#Number of teacher that a student can meet in his council >= minProf and <= maxProf:
-for i in range(nStu):
-    model.Add(sum(st[i][t] for t in range(nProf)) >= minProf)
-    model.Add(sum(st[i][t] for t in range(nProf)) <= maxProf)
+def st_least_and_most():
+    #Number of teacher that a student can meet in his council >= minProf and <= maxProf:
+    for i in range(nStu):
+        model.Add(sum(st[i][t] for t in range(nProf)) >= minProf)
+        model.Add(sum(st[i][t] for t in range(nProf)) <= maxProf)
+    return
+st_least_and_most()
 
-for i in range(nStu):
-    for t in range(nProf):
-        if PrfData[t][i] < minMachPrf:
-            model.Add(st[i][t] == 0)
+def st_set_up():
+    for i in range(nStu):
+        for t in range(nProf):
+            if PrfData[t][i] < minMachPrf:
+                model.Add(st[i][t] == 0)
 
-for i in range(len(Guide)):
-    model.Add(st[i][Guide[i]] == 0)
-    PrfData[Guide[i]][i]  = -999999
+    for i in range(len(Guide)):
+        model.Add(st[i][Guide[i]] == 0)
+        PrfData[Guide[i]][i]  = -999999
+
+    return
+st_set_up()
 
 #set up ss: student + student
 ss = [[0 for _ in range(nStu)] for __ in range(nStu)]
@@ -140,15 +148,21 @@ for i in range(nStu):
     for j in range(nStu):
         ss[i][j] = model.NewBoolVar(f'ss_{i}_{j}')
 
-for i in range(nStu):
-    for j in range(nStu):
-        if PrjData[i][j] < minMatchPrj:
-            PrjData[i][j] = -999999
-            model.Add(ss[i][j] == 0)
+def ss_set_up():
+    for i in range(nStu):
+        for j in range(nStu):
+            if PrjData[i][j] < minMatchPrj:
+                PrjData[i][j] = -999999
+                model.Add(ss[i][j] == 0)
+    return
+ss_set_up()
 
-for i in range(nStu):
-    for j in range(i+1,nStu):
-        model.Add(ss[i][j]==ss[j][i])
+def ss_symmetric():
+    for i in range(nStu):
+        for j in range(i+1,nStu):
+            model.Add(ss[i][j]==ss[j][i])
+    return
+ss_symmetric()
 
 #set up cst: council + student + teacher
 cst =[[ [ [] for __ in range(nProf)] for ___ in range(nStu) ] for _ in range(nCouncil)]
@@ -162,21 +176,10 @@ for b in range(nCouncil):
         for t in range(nProf):
             model.Add(cst[b][i][t] *3 <= cs[b][i] + ct[b][t] + st[i][t])
 
-'''
-for i in range(nStu):
-    for t in range(nProf):
-        if PrfData[t][i] < minMachPrf:
-            for b in range(nCouncil):
-                model.Add(cst[b][i][t] == 0)
 
-for i in range(len(Guide)):
-    for b in range(nCouncil):
-        w(f"{i}_{Guide[i]}")
-        model.Add(cst[b][i][Guide[i]] == 0)
-'''
-
-#Once
 def cst_once():
+    #Once: each teacher and each student can appear ONLY ONE
+    #Teacher:
     #part 1: a teacher CAN NOT assign in MORE THAN ONE council
     for t in range(nProf):
         for j in range(nStu):
@@ -188,19 +191,21 @@ def cst_once():
     #part 2: a teacher must be placed in AT LEAST ONE council
     for t in range(nProf):
         model.Add( sum( sum(cst[b][i][t] for i in range(nStu)) for b in range(nCouncil) ) >= 1)
+    #Student:
+    #part 1: a student CAN NOT assign in MORE THAN ONE council
+    for b1 in range(nCouncil):
+        for b2 in range(nCouncil):
+            if b1!=b2:
+                for i in range(nStu):
+                    for t1 in range(nProf):
+                        for t2 in range(nProf):
+                            model.Add(cst[b1][i][t1] + cst[b2][i][t2] <= 1)
+    #part 2: a student must be placed in AT LEAST ONE council
+    for i in range(nStu):
+        model.Add( sum( sum(cst[b][i][t] for t in range(nProf)) for b in range(nCouncil) ) >= 1)
     return
 
 cst_once()
-
-def cst_max_graph():
-    for i in range(nStu):
-        model.Add(sum( sum(cst[b][i][t] for b in range(nCouncil)) for t in range(nProf) ) 
-        == sum(st[i][t] for t in range(nProf)) )
-    for t in range(nProf):
-        model.Add(sum (sum(cst[b][i][t] for b in range(nCouncil)) for i in range(nStu))
-        == sum(st[i][t] for i in range(nStu)))
-
-cst_max_graph()
 
 def cst_all_link():
     for b in range(nCouncil):
@@ -244,7 +249,7 @@ def css_once(): #only one at one council
     return
     
 #done
-'''
+
 # css[b,i,j] must be symmetric, i.e css[b,i,j] = css[b,j,i]
 def css_symmectric():
     for b in range(nCouncil):
@@ -256,9 +261,9 @@ def css_symmectric():
                 model.Add(css[b][i][j] == css[b][j][i])
     return
 #done
-'''
 
-def css_least():
+
+def css_least_and_most():
     '''
     # Each council has at least ((minStu-1)* minStu)//2 edges:
     for b in range(nCouncil):
@@ -267,9 +272,6 @@ def css_least():
     # Each council has at least minStu vertexs:
     for i in range(nStu):
         model.Add(sum( sum(css[b][i][j] for j in range(nStu)) for b in range(nCouncil)) >= (minStu-1))
-    return
-
-def css_most():
     '''
     # Each council has at most (maxStu-1)*maxStu//2 edges:
     for b in range(nCouncil):
@@ -278,19 +280,10 @@ def css_most():
     # Each council has at most minStu vertexs:
     for i in range(nStu):
         model.Add(sum( sum(css[b][i][j] for j in range(nStu)) for b in range(nCouncil)) <= (maxStu-1))
+
     return
-'''
-# The match point of two prj in a Council must be >= minMatchPrj
-def css_not_the_same_council():
-    for i in range(nStu):
-        for j in range(i+1, nStu):
-            if PrjData[i][j] < minMatchPrj:
-                for b in range(nCouncil):
-                    # i and j are not in the same council
-                    model.Add(css[b][i][j] == 0)
-#not_the_same_council()
-#done
-'''
+
+
 #each Council is a completed graph
 def css_check_clique():
     #https://theses.hal.science/tel-01707043/document
@@ -304,8 +297,7 @@ def css_check_clique():
     
     DISCLAIMER:
     THIS CAN STILL RETURN A SUB GRAPH OF OUR CLIQUE, BUT DO NOT WORRY,
-    THE FIRST SOLVE RETURNED IS ALWAYS THE MOST OPTIMIZATION 
-    (WEIGHT OF A GRAPH > WEIGHT OF ITS SUB GRAPH)
+    THE RESULT RETURNED CAN ALWAYS MAKE A CLIQUE.
     '''
     for i in range(nStu):
         for j in range(i+1, nStu):
@@ -318,14 +310,11 @@ def css_check_clique():
                             model.Add( css[b][i][m] + css[b][j][l] <= 1 )
                     #done
     return
-#check_clique()
 #done
 
 css_once()
-#css_symmectric()
-css_least()
-css_most()
-#css_not_the_same_council()
+css_symmectric()
+css_least_and_most()
 css_check_clique()
 
 BeginTime = time.time()
