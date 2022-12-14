@@ -3,7 +3,7 @@ from ortools.linear_solver import pywraplp
 import time
 
 
-fileIN = "1.inp"
+fileIN = "data.txt"
 
 finp = open(fileIN,"r")
 
