@@ -3,7 +3,7 @@ from ortools.sat.python import cp_model
 import time
 
 
-fileIN = "2.out"
+fileIN = "data.txt"
 
 finp = open(fileIN,"r")
 
