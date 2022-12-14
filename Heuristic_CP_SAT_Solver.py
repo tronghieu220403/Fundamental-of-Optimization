@@ -158,7 +158,7 @@ def link_cs_ss():
     return
 link_cs_ss()
 
-def link_ct_cs_st():
+def link_cs_ct_st():
     for b in range(nCouncil):
         for i in range(nStu):
             for t in range(nProf):
