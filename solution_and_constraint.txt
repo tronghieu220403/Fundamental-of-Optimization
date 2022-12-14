@@ -103,3 +103,4 @@ maximize: sum(css[b,i,j]) + sum(cst[b,i,t])
 
 Cải tiến thời gian chạy bằng cách chỉ tìm kiếm kết quả trả ra thỏa mãn điều kiện đề bài (nhưng chưa chắc đã 
 tối ưu kết quả) -> Lấy kết quả trả đầu tiên làm đáp án bài toán -> Heuristics
+
