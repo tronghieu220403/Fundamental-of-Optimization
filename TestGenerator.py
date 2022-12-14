@@ -31,7 +31,7 @@ def solve(nStu, nProf, nCouncil):
             cs[b][i] = model.NewBoolVar(f'cs_{b}_{i}')
 
     def cs_once():
-        #Once
+        #Once 
         for i in range(nStu):
             model.Add( sum(cs[b][i] for b in range(nCouncil)) == 1)
         return
