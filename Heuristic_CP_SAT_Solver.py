@@ -2,16 +2,11 @@ from ortools.sat.python import cp_model
 
 import time
 
-
 fileIN = "1.inp"
-
 finp = open(fileIN,"r")
 
 nStu, nProf, nCouncil = map(int, finp.readline().split())
-
 minStu, maxStu, minProf, maxProf, minMatchStu, minMachProf = map(int, finp.readline().split())
-
-PrjData = [[] for i in range(nStu) ]
 
 def r():
     while True:
@@ -20,11 +15,12 @@ def r():
             continue
         return list(map(int, xx.split()))
         
+PrjData = [[] for i in range(nStu) ]
 for i in range(nStu):
     PrjData[i] = r()
+    PrjData[i][i]= 0
 
 PrfData = [[] for i in range(nProf) ]
-
 for i in range(nProf):
     PrfData[i] = r()
 
@@ -32,11 +28,7 @@ Guide = r()
 for i in range(len(Guide)):
     Guide[i] -= 1
 
-
 BeginTime = time.time()
-
-for i in range(nStu):
-    PrjData[i][i]= 0
             
 print("LET'S START",flush=True)
 
@@ -176,6 +168,8 @@ if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
     print("No solution.")
     exit()
 
+print("FINISH!",flush=True)
+    
 EndTime = time.time()
 
 ans = 0
