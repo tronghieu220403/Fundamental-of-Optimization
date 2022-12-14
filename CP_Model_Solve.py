@@ -157,6 +157,13 @@ def ss_set_up():
     return
 ss_set_up()
 
+def ss_least_and_most():
+    for i in range(nStu):
+        model.Add(sum(ss[i][j] for j in range(nStu)) >= minStu-1)
+        model.Add(sum(ss[i][j] for j in range(nStu)) <= maxStu-1)
+    return
+ss_least_and_most()
+
 def ss_symmetric():
     for i in range(nStu):
         for j in range(i+1,nStu):
