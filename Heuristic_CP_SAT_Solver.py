@@ -2,7 +2,7 @@ from ortools.sat.python import cp_model
 
 import time
 
-fileIN = "1.inp"
+fileIN = "data.txt"
 finp = open(fileIN,"r")
 
 nStu, nProf, nCouncil = map(int, finp.readline().split())
