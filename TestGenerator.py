@@ -193,7 +193,7 @@ def solve(nStu, nProf, nCouncil):
         table1[l[index][0]][l[index][1]] = 1
         l.remove((l[index][0],l[index][1]))
     
-    fout = open("2.out","w")
+    fout = open("data.txt","w")
     def w(x="", end = '\n'):
         fout.write(format(x))
         fout.write(end)
