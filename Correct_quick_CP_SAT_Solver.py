@@ -1,9 +1,9 @@
-from ortools.linear_solver import pywraplp
+from ortools.sat.python import cp_model
 
 import time
 
 
-fileIN = "1.inp"
+fileIN = "2.out"
 
 finp = open(fileIN,"r")
 
@@ -40,32 +40,29 @@ for i in range(nStu):
             
 print("LET'S START",flush=True)
 
-solver = pywraplp.Solver.CreateSolver('SCIP')
-if solver is None:
-    print('SCIP solver unavailable.')
-    exit()
+model = cp_model.CpModel()
 
 #set up cs: council + student
 cs = [[0 for _ in range(nStu)] for __ in range(nCouncil)]
 
 for b in range(nCouncil):
     for i in range(nStu):
-        cs[b][i] = solver.BoolVar(f'cs_{b}_{i}')
+        cs[b][i] = model.NewBoolVar(f'cs_{b}_{i}')
 
 def cs_once():
     #Once
     for i in range(nStu):
-        solver.Add( sum(cs[b][i] for b in range(nCouncil)) == 1)
+        model.Add( sum(cs[b][i] for b in range(nCouncil)) == 1)
     return
 cs_once()
 
 def cs_limit():
     #Number of project in a council >= minStu and <= maxStu
     for b in range(nCouncil):
-        solver.Add( sum(cs[b][i] for i in range(nStu)) >= minStu)
+        model.Add( sum(cs[b][i] for i in range(nStu)) >= minStu)
         
     for b in range(nCouncil):
-        solver.Add( sum(cs[b][i] for i in range(nStu)) <= maxStu)
+        model.Add( sum(cs[b][i] for i in range(nStu)) <= maxStu)
     
     return
 cs_limit()
@@ -74,20 +71,20 @@ cs_limit()
 ct = [[0 for _ in range(nProf)] for __ in range(nCouncil)]
 for b in range(nCouncil):
     for t in range(nProf):
-        ct[b][t] = solver.BoolVar(f'ct_{b}_{t}')
+        ct[b][t] = model.NewBoolVar(f'ct_{b}_{t}')
 
 def ct_once():
     #Once
     for t in range(nProf):
-        solver.Add(sum(ct[b][t] for b in range(nCouncil)) == 1)
+        model.Add(sum(ct[b][t] for b in range(nCouncil)) == 1)
     return
 ct_once()
 
 def ct_limit():
     #Number of teacher in a council >= minProf and <= maxProf:
     for b in range(nCouncil):
-        solver.Add(sum(ct[b][t] for t in range(nProf)) >= minProf)
-        solver.Add(sum(ct[b][t] for t in range(nProf)) <= maxProf)
+        model.Add(sum(ct[b][t] for t in range(nProf)) >= minProf)
+        model.Add(sum(ct[b][t] for t in range(nProf)) <= maxProf)
     return
 ct_limit()
 
@@ -95,16 +92,16 @@ ct_limit()
 st = [[0 for _ in range(nProf)] for __ in range(nStu)]
 for i in range(nStu):
     for t in range(nProf):
-        st[i][t] = solver.BoolVar(f'st_{i}_{t}')
+        st[i][t] = model.NewBoolVar(f'st_{i}_{t}')
 
 def st_set_up():
     for i in range(nStu):
         for t in range(nProf):
             if PrfData[t][i] < minMachProf:
-                solver.Add(st[i][t] == 0)
+                model.Add(st[i][t] == 0)
 
     for i in range(len(Guide)):
-        solver.Add(st[i][Guide[i]] == 0)
+        model.Add(st[i][Guide[i]] == 0)
 
     return
 st_set_up()
@@ -113,12 +110,12 @@ st_set_up()
 def st_limit():
     #Number of teacher that a student can meet in his council >= minProf and <= maxProf:
     for i in range(nStu):
-        solver.Add(sum(st[i][t] for t in range(nProf)) >= minProf)
-        solver.Add(sum(st[i][t] for t in range(nProf)) <= maxProf)
+        model.Add(sum(st[i][t] for t in range(nProf)) >= minProf)
+        model.Add(sum(st[i][t] for t in range(nProf)) <= maxProf)
     #Number of student that a teacher can meet in his council >= minProf and <= maxProf:
     for t in range(nProf):
-        solver.Add(sum(st[i][t] for i in range(nStu)) >= minStu)
-        solver.Add(sum(st[i][t] for i in range(nStu)) <= maxStu)
+        model.Add(sum(st[i][t] for i in range(nStu)) >= minStu)
+        model.Add(sum(st[i][t] for i in range(nStu)) <= maxStu)
 
     return
 st_limit()
@@ -128,28 +125,28 @@ st_limit()
 ss = [[0 for _ in range(nStu)] for __ in range(nStu)]
 for i in range(nStu):
     for j in range(nStu):
-        ss[i][j] = solver.BoolVar(f'ss_{i}_{j}')
+        ss[i][j] = model.NewBoolVar(f'ss_{i}_{j}')
 
 def ss_set_up():
     for i in range(nStu):
-        solver.Add(ss[i][i] == 0)
+        model.Add(ss[i][i] == 0)
         for j in range(nStu):
             if PrjData[i][j] < minMatchStu:
-                solver.Add(ss[i][j] == 0)
+                model.Add(ss[i][j] == 0)
     return
 ss_set_up()
 
 def ss_symmetric():
     for i in range(nStu):
         for j in range(i+1,nStu):
-            solver.Add(ss[i][j]==ss[j][i])
+            model.Add(ss[i][j]==ss[j][i])
     return
 ss_symmetric()
 
 def ss_limit():
     for i in range(nStu):
-        solver.Add(sum(ss[i][j] for j in range(nStu)) >= minStu-1)
-        solver.Add(sum(ss[i][j] for j in range(nStu)) <= maxStu-1)
+        model.Add(sum(ss[i][j] for j in range(nStu)) >= minStu-1)
+        model.Add(sum(ss[i][j] for j in range(nStu)) <= maxStu-1)
     return
 ss_limit()
 
@@ -157,7 +154,7 @@ def link_cs_ss():
     for b in range(nCouncil):
         for i in range(nStu):
             for j in range(i+1,nStu):
-                solver.Add(cs[b][i] + cs[b][j] <= ss[i][j] +1)
+                model.Add(cs[b][i] + cs[b][j] <= ss[i][j] +1)
     return
 link_cs_ss()
 
@@ -165,31 +162,33 @@ def link_cs_ct_st():
     for b in range(nCouncil):
         for i in range(nStu):
             for t in range(nProf):
-                solver.Add(cs[b][i] + ct[b][t] <= st[i][t] + 1)
+                model.Add(cs[b][i] + ct[b][t] <= st[i][t] + 1)
     return
 link_cs_ct_st()
 
 # Maximize total value of packed items.
-objective = solver.Objective()
+objective = []
 for i in range(nStu):
     for j in range(nStu):
-        objective.SetCoefficient(ss[i][j], PrjData[i][j])
+        objective.append(cp_model.LinearExpr.Term(ss[i][j], PrjData[i][j]))
     for t in range(nProf):
-        objective.SetCoefficient(st[i][t], PrfData[t][i])
+        objective.append(cp_model.LinearExpr.Term(st[i][t], PrfData[t][i]))
 
-objective.SetMaximization()
+model.Maximize(cp_model.LinearExpr.Sum(objective))
 
 BeginTime = time.time()
 
-status = solver.Solve()
+solver = cp_model.CpSolver()
+solver.parameters.enumerate_all_solutions = False
 
-if status not in [pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE]:
+status = solver.Solve(model)
+if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
     print("No solution.")
     exit()
 
 EndTime = time.time()
 
-ans = int(objective.Value()+0.2)
+ans = int(solver.ObjectiveValue()+0.2)
 
 fileOut = "1.out"
 fout = open(fileOut,"w")
@@ -197,16 +196,22 @@ def w(x="",end='\n'):
     fout.write(format(x))
     fout.write(end)
 
+table = [[[] for __ in range(2)] for _ in range(nCouncil)]
+
 for b in range(nCouncil):
     w("Council "+ str(b+1))
     w("Project: ")
     for i in range(nStu):
-        if int(cs[b][i].solution_value())>0:
+        if int(solver.Value(cs[b][i]))>0:
+            table[b][0].append(i)
             w(str(i),end = " ")
+    w()
     w("Teacher: ")
     for t in range(nProf):
-        if int(ct[b][t].solution_value())>0:
+        if int(solver.Value(ct[b][t]))>0:
+            table[b][1].append(t)
             w(str(t),end = " ")
+    w()
     w()
 
 w()
