@@ -2,16 +2,11 @@ from ortools.linear_solver import pywraplp
 
 import time
 
-
 fileIN = "1.inp"
-
 finp = open(fileIN,"r")
 
 nStu, nProf, nCouncil = map(int, finp.readline().split())
-
 minStu, maxStu, minProf, maxProf, minMatchStu, minMachProf = map(int, finp.readline().split())
-
-PrjData = [[] for i in range(nStu) ]
 
 def r():
     while True:
@@ -19,12 +14,12 @@ def r():
         if len(xx) == 1:
             continue
         return list(map(int, xx.split()))
-        
+
+PrjData = [[] for i in range(nStu) ]        
 for i in range(nStu):
     PrjData[i] = r()
 
 PrfData = [[] for i in range(nProf) ]
-
 for i in range(nProf):
     PrfData[i] = r()
 
@@ -161,13 +156,13 @@ def link_cs_ss():
     return
 link_cs_ss()
 
-def link_cs_cs_st():
+def link_cs_ct_st():
     for b in range(nCouncil):
         for i in range(nStu):
             for t in range(nProf):
                 solver.Add(cs[b][i] + ct[b][t] <= st[i][t] + 1)
     return
-link_cs_cs_st()
+link_cs_ct_st()
 
 
 #set up cst: council + student + teacher
