@@ -61,6 +61,10 @@ i from 0 to nStu:
 
 
 Link cs and ss:
+We can see that project vs project in the same council will create a completed graph
+https://theses.hal.science/tel-01707043/document
+page 15 in The Maximum Vertex Weight Clique Problem (MVWCP). 
+According to that, we came to this conclusion:
 +) Both student i and j can be in the same council only if they are paired(i.e ss[i,j] = 1)
 b from 0 to nCouncil:
 	i from 0 to nStu:
@@ -68,6 +72,7 @@ b from 0 to nCouncil:
 			cs[b,i] + cs[b,j] <= ss[i,j] + 1
 
 Link cs and ct and st:
+We can see that project vs teacher in the same council will create a two-sides graph
 +) Both teacher t and student i can be in the same council only if they are paired(i.e st[i,t] = 1)
 b from 0 to nCouncil:
 	i from 0 to nStu:
