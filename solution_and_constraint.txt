@@ -79,6 +79,8 @@ b from 0 to nCouncil:
 		t from 0 to nProf:
 			cs[b,i] + ct[b,t] <= st[i,t] + 1
 
+To have the correct solution, we have 2 methods.
+Method 1: Easier to understand, but slower in time complexity
 cst: cst[b,i,t] = 1 means both that student i and teacher t are in council b
 +) Link:
 b from 0 to nCouncil:
@@ -102,9 +104,14 @@ css[b,i,j] can only be TRUE when all below conditions are TRUE:
 +) cs[b,j] = 1: Student j is in council b
 +) ss[i,j] = 1: Student i and student j are in the same council (They are paired)
 
-maximize: sum(css[b,i,j]) + sum(cst[b,i,t])
+maximize: sum(css[b,i,j] * PrjData[i][j]) + sum(cst[b,i,t] * PrfData[t][i])
 
--> thuật toán chạy chính xác, kết quả tối đa, thời gian chạy lâu.
+Method 2: faster
+
+maximize: sum(ss[i,j] * PrjData[i][j]) + sum(st[i,t] * PrfData[t][i])
+
+Qua 2 method, ta thấy:
+-> thuật toán chạy chính xác, kết quả tối đa, thời gian chạy lâu (1 cái nhanh hơn cái còn lại nhưng vẫn lâu)
 
 Cải tiến thời gian chạy bằng cách chỉ tìm kiếm kết quả trả ra thỏa mãn điều kiện đề bài (nhưng chưa chắc đã 
 tối ưu kết quả) -> Lấy kết quả trả đầu tiên làm đáp án bài toán -> Heuristics
