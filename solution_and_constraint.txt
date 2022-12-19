@@ -2,7 +2,7 @@ s: student
 t: teacher
 c: council
 
-cs: cs[b,i] = 1 means that student i in council t
+cs: cs[b,i] = 1 means that student i in council b
 +) Once: Each student appear EXACTLY 1 time
 i from 0 to nStu:
 	sum(cs[b,i] for b in range(nCouncil)) == 1
@@ -11,7 +11,7 @@ i from 0 to nStu:
 b from 0 to nCouncil:
 	maxStu >= sum(cs[b,i] for i in range(nStu)) >= minStu
 
-ct: ct[b,t] = 1 means that teacher t in council t
+ct: ct[b,t] = 1 means that teacher t in council b
 +) Once (Each teacher appear EXACTLY 1 time):
 t from 0 to nProf:
 	sum(ct[b,t] for b in range(nCouncil)) == 1
