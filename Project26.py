@@ -76,9 +76,7 @@ class CP():
         return
     
     def SetConstraints(self):
-        
-        print(self.minMatchStu)
-        
+                
         if self.IsInputed == 0:
             CP.ReadInput(self)
         
@@ -168,7 +166,6 @@ class CP():
                 self.ss[i][j] = self.model.NewBoolVar(f'ss_{i}_{j}')
 
         def ss_set_up():
-            print(self.minMatchStu)
             for i in range(self.nStu):
                 self.model.Add(self.ss[i][i] == 0)
                 for j in range(self.nStu):
@@ -281,7 +278,6 @@ class CP():
     def Change_e_f(self, e = None,f = None):
         if e!=None:
             self.minMatchStu = e
-            print(self.minMatchStu)
         if f!=None:
             self.minMachProf = f
         self.IsConstrainted = 0
