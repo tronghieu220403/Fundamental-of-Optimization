@@ -190,10 +190,10 @@ class CP():
         table = [[[] for __ in range(2)] for _ in range(self.nCouncil)]
         for b in range(self.nCouncil):
             for i in range(self.nStu):
-                if int(self.solver.Value(self.cs[b][i]))>0:
+                if int(self.solver.BooleanValue(self.cs[b][i]))>0:
                     table[b][0].append(i)
             for t in range(self.nProf):
-                if int(self.solver.Value(self.ct[b][t]))>0:
+                if int(self.solver.BooleanValue(self.ct[b][t]))>0:
                     table[b][1].append(t)
 
         ans = 0

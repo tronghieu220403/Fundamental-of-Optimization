@@ -2,10 +2,10 @@ from random import *
 from Project26Heuristic import CP
 def r(x,y=0):
     return randint(y,x)
-from ortools.sat.python import cp_model
-import time
 
-# only use two function in line 228 or 230
+from ortools.sat.python import cp_model
+
+import time
 
 BeginTime = time.time()
 table = []
@@ -74,19 +74,19 @@ def solve(nStu, nProf, nCouncil):
     
     BeginTime = time.time()
 
+    print("Solving",flush=True)
     solver = cp_model.CpSolver()
-    solver.parameters.enumerate_all_solutions = False
-
+    #solver.parameters.enumerate_all_solutions = False
     solver.parameters.max_time_in_seconds = 10.0
 
     status = solver.Solve(model)
+    print("Done",flush=True)
+    if status in [cp_model.UNKNOWN]:
+        return 0
+
     if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
         return 0
     
-    if status in [cp_model.UNKNOWN]:
-        return 0
-    
-    global table
     table = [[0 for __ in range(nStu)] for _ in range(nStu)]
     
     l = []
@@ -96,59 +96,59 @@ def solve(nStu, nProf, nCouncil):
     for b in range(nCouncil):
         for i in range(nStu):
             for j in range(i+1,nStu):
-                if solver.Value(cs[b][i]) > 0 and solver.Value(cs[b][j]) > 0:
+                if solver.BooleanValue(cs[b][i]) > 0 and solver.BooleanValue(cs[b][j]) > 0:
                     ss[i][j] = 1
                     ss[j][i] = 1
             for t in range(nProf):
-                if solver.Value(cs[b][i]) > 0 and solver.Value(ct[b][t]) > 0:
+                if solver.BooleanValue(cs[b][i]) > 0 and solver.BooleanValue(ct[b][t]) > 0:
                     st[i][t] = 1
-                    
+
     for i in range(nStu):
-        for j in range(nStu):
+        for j in range(i+1,nStu):
             if (ss[i][j]) > 0:
                 table[i][j] = 1
+                table[j][i] = 1
             elif i!=j:
                 l.append((i,j))
-        
+
     giveaway = nStu*nStu//4
+    sz = len(l)
     for i in range(giveaway):
-        if len(l)==0:
+        if sz==0:
             break
-        index = r(len(l)-1)
-        gg = l[index]
+        index = r(sz-1)
         table[l[index][0]][l[index][1]] = 1
         table[l[index][1]][l[index][0]] = 1
-        l.remove((gg[0],gg[1]))
-        l.remove((gg[1],gg[0]))
-    
-    l = []
-    
-    global table1
+        l[index],l[sz-1] = l[sz-1],l[index]
+        sz = sz - 1
+        
+        
     table1 = [[0 for __ in range(nStu)] for _ in range(nProf)]
     
     l = []
-    
+
     for i in range(nStu):
         for t in range(nProf):
             if (st[i][t]) > 0:
                 table1[t][i] = 1
             elif j!=Guide[i]:
                 l.append((t,i))
-        
+    sz = len(l)
     giveaway = nStu*nProf//4 * 2
     for i in range(giveaway):
-        if len(l)==0:
+        if sz==0:
             break
-        index = r(len(l)-1)
+        index = r(sz-1)
         table1[l[index][0]][l[index][1]] = 1
-        l.remove((l[index][0],l[index][1]))
+        l[index],l[sz-1] = l[sz-1],l[index]
+        sz = sz-1
     
     fout = open("1.inp","w")
     def w(x="", end = '\n'):
         fout.write(format(x))
         fout.write(end)
         return
-    
+
     w(str(nStu) + " " + str(nProf) + " " + str(nCouncil))
     minMatchPrj = r(100)
     minMatchPrf = r(100)
@@ -173,6 +173,8 @@ def solve(nStu, nProf, nCouncil):
     for i in range(nStu):
         w(Guide[i]+1,end = " ")
     w()
+    fout.close()
+
     return 1
 
 import os
@@ -209,9 +211,7 @@ def check():
             for t in Prf:
                 if PrfData[t][i] < f:
                     raise ValueError(f'Wrong in PrfData: {t} {i}: {PrfData[t][i]} < {f}')
-    print("No error found.")
     return
-
 
 def GenerateAndCheck(NumTest,n,m):
     for _ in range(NumTest):
