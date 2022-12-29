@@ -22,20 +22,21 @@ So, in this case, we came to some simple conclusion to improve runtime of the he
 
 So we only need:
 
-def link_cs_cs():
-    for b in range(self.nCouncil):
-        for i in range(self.nStu):
-            for j in range(i+1,self.nStu):
-                if self.PrjData[i][j] < self.minMatchStu or self.PrjData[j][i] < self.minMatchStu:
-                    self.model.AddAtMostOne([self.cs[b][i], self.cs[b][j]])
-    return
-link_cs_cs()
 
-def link_cs_ct():
-    for b in range(self.nCouncil):
-        for i in range(self.nStu):
-            for t in range(self.nProf):
-                if self.PrfData[t][i] < self.minMachProf or t == self.Guide[i]:
-                    self.model.AddAtMostOne([self.cs[b][i], self.ct[b][t]])
-    return
-link_cs_ct()
+    def link_cs_cs():
+        for b in range(self.nCouncil):
+            for i in range(self.nStu):
+                for j in range(i+1,self.nStu):
+                    if self.PrjData[i][j] < self.minMatchStu or self.PrjData[j][i] < self.minMatchStu:
+                        self.model.AddAtMostOne([self.cs[b][i], self.cs[b][j]])
+        return
+    link_cs_cs()
+
+    def link_cs_ct():
+        for b in range(self.nCouncil):
+            for i in range(self.nStu):
+                for t in range(self.nProf):
+                    if self.PrfData[t][i] < self.minMachProf or t == self.Guide[i]:
+                        self.model.AddAtMostOne([self.cs[b][i], self.ct[b][t]])
+        return
+    link_cs_ct()
