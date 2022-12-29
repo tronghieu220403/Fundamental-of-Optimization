@@ -1,8 +1,7 @@
 File:
+
 +) Project26Heuristic is where our main code saved.
-
 +) MaximizeEF is to maximize last constraints of the project.
-
 +) TestGenerator will generate test cases + check your answer or check you answer only.
 
 So, in this case, we came to some simple conclusion to improve runtime of the heuristic:
