@@ -23,6 +23,8 @@ if(a.SolveHeuristic()==1):
     print("There exists a solution for default e and f of the teacher's data.")
 else:
     print("There exists no solution for default e and f of the teacher's data.")
+    print("Status: "+a.GetValue("status"))
+    exit()
     
 a.PrintAns("1.out")
 

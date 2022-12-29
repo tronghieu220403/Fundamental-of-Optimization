@@ -190,6 +190,7 @@ def read():
         return list(map(int, xx.split()))
 
 def check():
+    print("Checking...")
     x = CP("1.inp")
     StuData, PrfData = x.ReadInput()
     l = read()
@@ -210,6 +211,7 @@ def check():
                 if PrfData[t][i] < f:
                     raise ValueError(f'Wrong in PrfData: {t} {i}: {PrfData[t][i]} < {f}')
     finp.close()
+    print("No error found.")
     return
 
 def GenerateAndCheck(NumTest,n,m):
