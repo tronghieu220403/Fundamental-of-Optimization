@@ -77,8 +77,13 @@ def solve(nStu, nProf, nCouncil):
     solver = cp_model.CpSolver()
     solver.parameters.enumerate_all_solutions = False
 
+    solver.parameters.max_time_in_seconds = 10.0
+
     status = solver.Solve(model)
     if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
+        return 0
+    
+    if status in [cp_model.UNKNOWN]:
         return 0
     
     global table
@@ -210,12 +215,16 @@ def check():
 
 def GenerateAndCheck(NumTest,n,m):
     for _ in range(NumTest):
-        print('\n' + str(_) +'\n')
+        print('\nTest case ' + str(_))
+        print("Finding a case...")
         while True:
+            n = 500
             nCouncil = r(int(n**0.5)+3,5)
-            if solve(n,m,nCouncil) == 0:
+            if solve(n,n,nCouncil) == 0:
+                print("Can not find a case. Trying again...")
                 continue
             else:
+                print("Found a case.")
                 os.system("python MaximizeEF.py")
                 finp = open("2.out","r")
                 check()
