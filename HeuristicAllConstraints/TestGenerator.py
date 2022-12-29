@@ -74,13 +74,11 @@ def solve(nStu, nProf, nCouncil):
     
     BeginTime = time.time()
 
-    print("Solving",flush=True)
     solver = cp_model.CpSolver()
-    #solver.parameters.enumerate_all_solutions = False
+    solver.parameters.enumerate_all_solutions = False
     solver.parameters.max_time_in_seconds = 10.0
 
     status = solver.Solve(model)
-    print("Done",flush=True)
     if status in [cp_model.UNKNOWN]:
         return 0
 
@@ -150,9 +148,9 @@ def solve(nStu, nProf, nCouncil):
         return
 
     w(str(nStu) + " " + str(nProf) + " " + str(nCouncil))
-    minMatchPrj = r(100)
-    minMatchPrf = r(100)
-    w(str(minStu) + " " + str(maxStu) + " " + str(minProf) + " " + str(maxProf) + " " + str(minMatchPrj-10) + " " + str(minMatchPrf-10))
+    minMatchPrj = r(150,50)
+    minMatchPrf = r(150,50)
+    w(str(minStu) + " " + str(maxStu) + " " + str(minProf) + " " + str(maxProf) + " " + str(minMatchPrj) + " " + str(minMatchPrf))
     
     for i in range(nStu):
         for j in range(nStu):
@@ -211,6 +209,7 @@ def check():
             for t in Prf:
                 if PrfData[t][i] < f:
                     raise ValueError(f'Wrong in PrfData: {t} {i}: {PrfData[t][i]} < {f}')
+    finp.close()
     return
 
 def GenerateAndCheck(NumTest,n,m):
