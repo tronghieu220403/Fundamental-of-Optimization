@@ -141,10 +141,10 @@ class CP():
 
         return
 
-    def Solve(self, RunTime = 60.0):        
+    def Solve(self, RunTime = 10.0):        
         self.solver = cp_model.CpSolver()
         #self.solver.parameters.num_search_workers = 8
-        self.solver.parameters.enumerate_all_solutions = False
+        #self.solver.parameters.enumerate_all_solutions = False
         self.solver.parameters.max_time_in_seconds = RunTime
 
         self.BeginTime = time.time()
@@ -163,7 +163,7 @@ class CP():
         self.IsSolved = 1
         return 1
 
-    def SolveHeuristic(self, RunTime = 60.0):
+    def SolveHeuristic(self, RunTime = 10.0):
         self.status = None
         CP.SetConstraints(self)
         return CP.Solve(self,RunTime)
