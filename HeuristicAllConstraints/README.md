@@ -8,14 +8,16 @@ File:
 
 So, in this case, we came to some simple conclusion to improve runtime of the heuristic:
 
-1) No more need ss[i][j], st[i][j]
+1) No more need ss[i][j], st[i][j]:
 
 +) If cs[b,i] == 1 and cs[b,j] == 1 mean that i and j are in the same council, this is only use to calculate the result so we don't need ss[i][j] = 1 to store them.
+
 +) Similary to st[i,t]
 
-2) No more need link_cs_cs_ss() and link_cs_ct_cs()
+2) No more need link_cs_cs_ss() and link_cs_ct_cs():
 
 +) We have a conclusion: If i and j can be connected, they must be in the in different council -> All the students in a same council can be connected with each others.
+
 +) Similary to i and t.
 
 So we only need:
