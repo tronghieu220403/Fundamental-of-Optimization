@@ -24,7 +24,8 @@ if(a.SolveHeuristic()==1):
 else:
     print("There exists no solution for default e and f of the teacher's data.")
     print("Status: "+a.GetValue("status"))
-    exit()
+    eleft = 0
+    fleft = 0
     
 a.PrintAns("1.out")
 
@@ -37,7 +38,7 @@ RunTime = 0
 
 while(eleft<=eright):
     mid = (eleft+eright)//2
-    a.ChangeEF(StuData[mid])
+    a.ChangeEF(StuData[mid],PrfData[fleft])
     if a.SolveHeuristic(2)==1:
         emax = max(emax,mid)
         eleft = mid + 1

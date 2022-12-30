@@ -219,7 +219,7 @@ def GenerateAndCheck(NumTest,n,m):
         print('\nTest case ' + str(_))
         print("Finding a case...")
         while True:
-            n = 500
+            n = 100
             nCouncil = r(int(n**0.5)+3,5)
             if solve(n,n,nCouncil) == 0:
                 print("Can not find a case. Trying again...")
@@ -237,7 +237,7 @@ def CheckOnly():
     check()
 
 #Generate input to 1.inp and check the result.
-#GenerateAndCheck(1,50,50) #n and m are number of students and number of teachers
+GenerateAndCheck(1,50,50) #n and m are number of students and number of teachers
 
-CheckOnly() #if you already have an input file "1.inp", you can check your code with that test case by using this.
+#CheckOnly() #if you already have an input file "1.inp", you can check your code with that test case by using this.
     
