@@ -18,8 +18,6 @@ def solve(nStu, nProf, nCouncil):
     model = cp_model.CpModel()
 
     Guide = [0 for _ in range(nStu)]
-    for i in range(len(Guide)):
-        Guide[i] = r(nProf-1)
 
     minStu = r(nStu//nCouncil- (r(max(nStu//nCouncil-2,1),1))//2,2)
     maxStu = minStu + r(max(2,nStu-nCouncil*minStu), 2)
@@ -129,8 +127,10 @@ def solve(nStu, nProf, nCouncil):
         for t in range(nProf):
             if (st[i][t]) > 0:
                 table1[t][i] = 1
-            elif j!=Guide[i]:
-                l.append((t,i))
+            else:
+                Guide[i] = t
+                if j!=Guide[i]:
+                    l.append((t,i))
     sz = len(l)
     giveaway = nStu*nProf//4 * 2
     for i in range(giveaway):
@@ -196,7 +196,6 @@ def check():
     l = read()
     if l == -1:
         return
-    #print(l)
     e, f = l[0],l[1]
     nCouncil = x.GetValue("nCouncil")
     for b in range(nCouncil):
@@ -210,7 +209,6 @@ def check():
             for t in Prf:
                 if PrfData[t][i] < f:
                     raise ValueError(f'Wrong in PrfData: {t} {i}: {PrfData[t][i]} < {f}')
-    finp.close()
     print("No error found.")
     return
 
@@ -219,14 +217,14 @@ def GenerateAndCheck(NumTest,n,m):
         print('\nTest case ' + str(_))
         print("Finding a case...")
         while True:
-            n = 100
             nCouncil = r(int(n**0.5)+3,5)
-            if solve(n,n,nCouncil) == 0:
+            if solve(n,m,nCouncil) == 0:
                 print("Can not find a case. Trying again...")
                 continue
             else:
                 print("Found a case.")
                 os.system("python MaximizeEF.py")
+                global finp 
                 finp = open("2.out","r")
                 check()
                 finp.close()
