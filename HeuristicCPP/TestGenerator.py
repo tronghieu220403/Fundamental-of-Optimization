@@ -211,5 +211,5 @@ def CheckOnly(x):
 
 #Generate input to 1.inp and check the result.
 #GenerateAndCheck(30,500,500) #n and m are number of students and number of teachers
-Generate(300,300,20)
-CheckOnly(0) #if you already have an input file "1.inp", you can check your code with that test case by using this.
+Generate(100,100,5)
+CheckOnly(1) #if you already have an input file "1.inp", you can check your code with that test case by using this.
