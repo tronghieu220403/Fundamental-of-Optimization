@@ -160,7 +160,7 @@ def Generate(nStu, nProf, nCouncil):
     return 1
 
 def check():
-    print("Checking...")
+    print("Checking your answer...")
     global finp 
     finp = open("1.out","r")
     x = CP("1.inp")
@@ -206,10 +206,12 @@ def check():
 
 def CheckOnly(x):
     if x==1:
+        BeginTime = time.time()
         os.system("1.exe")
+        print(f"Solve in {time.time()-BeginTime}s.")
     check()
 
 #Generate input to 1.inp and check the result.
 #GenerateAndCheck(30,500,500) #n and m are number of students and number of teachers
-Generate(100,100,5)
+Generate(1000,1000,35)
 CheckOnly(1) #if you already have an input file "1.inp", you can check your code with that test case by using this.
