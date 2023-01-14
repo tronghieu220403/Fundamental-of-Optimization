@@ -128,8 +128,8 @@ def Generate(nStu, nProf, nCouncil):
         return
 
     w(str(nStu) + " " + str(nProf) + " " + str(nCouncil))
-    minMatchPrj = r(1500,500)
-    minMatchPrf = r(1500,500)
+    minMatchPrj = r(15000000,500)
+    minMatchPrf = r(15000000,500)
     w(str(minStu) + " " + str(maxStu) + " " + str(minProf) + " " + str(maxProf) + " " + str(minMatchPrj) + " " + str(minMatchPrf))
     
     for i in range(nStu):
@@ -156,6 +156,8 @@ def Generate(nStu, nProf, nCouncil):
         w(Guide[i]+1,end = " ")
     w()
     fout.close()
+
+    print("Generated.",flush=True)
 
     return 1
 
@@ -204,7 +206,7 @@ def check():
     print("No error found.")
     return
 
-def CheckOnly(x):
+def CheckOnly(x=0):
     if x==1:
         BeginTime = time.time()
         os.system("1.exe")
@@ -213,5 +215,5 @@ def CheckOnly(x):
 
 #Generate input to 1.inp and check the result.
 #GenerateAndCheck(30,500,500) #n and m are number of students and number of teachers
-Generate(1000,1000,35)
-CheckOnly(1) #if you already have an input file "1.inp", you can check your code with that test case by using this.
+#Generate(1000,1000,35)
+CheckOnly() #if you already have an input file "1.inp", you can check your code with that test case by using this.

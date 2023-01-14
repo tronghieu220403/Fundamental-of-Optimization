@@ -28,9 +28,9 @@ struct dou_ll
 
 int del(vector<dou_ll> &a, int id)
 {
-    if(a[id].prev==0&&a[id].next==1004)
-        return 0;
-    if(a[id].prev==0&&a[id].next==0)
+    //if(a[id].prev==0&&a[id].next==1004)
+        //return 0;
+    if(a[id].prev==0&&a[id].next<=id)
         return 0;
     a[a[id].prev].next = a[id].next;
     a[a[id].next].prev = a[id].prev;
@@ -90,8 +90,11 @@ struct linked
 
 linked t[1104],s[1104];
 
+clock_t TotalTime = 0;
+
 int intersection(vector<dou_ll> &p,vector<dou_ll> &pa)
 {
+    clock_t t0 = clock();
     int ans = 0;
     int now1 = 0;
     while(p[now1].next!=1004&&p[now1].next!=0)
@@ -101,10 +104,15 @@ int intersection(vector<dou_ll> &p,vector<dou_ll> &pa)
             ans++;
         now1 = p[now1].next;
     }
+    TotalTime += clock()-t0;
     return ans;
 }
 
 vector<dou_ll> pt,ps,pta,psa;
+
+int ps_sis[1100];
+int pt_sit[1100];
+int ps_tts[1100];
 
 int solve(int e, int f)
 {
@@ -168,18 +176,10 @@ int solve(int e, int f)
         t[_t].ssz = ins(t[_t].s,trash);
         trash.clear();
     }
-    //cout<<el;
-    //cout<<"OKE"<<flush;
-    //cout<<intersection(s[8].s,s[7].s)<<el;
-    //return 0;
-    /*
-    for(int i=0;i<g.nProf;i++)
-    {
-        cout<<t[i].ssz<<el;
-    }
-    */
     pt.clear();ps.clear();psa.clear();pta.clear();
     int lit[1100],lis[1100];
+    int lit1[1100],lis1[1100];
+
     int sels[1100],selt[1100];
     fill(sels,sels+1050,0);
     fill(selt,selt+1050,0);
@@ -192,30 +192,15 @@ int solve(int e, int f)
         c[_c].t.clear();
         c[_c].ps_sz = 0;
         c[_c].pt_sz = 0;
-        //c[_c].t.resize(1100);
-        //c[_c].s.resize(1100);
         c[_c].ps.resize(1100);
         c[_c].pt.resize(1100);
-        //memset(&c[_c].ps[0],0,1100*sizeof(dou_ll));
-        //memset(&c[_c].pt[0],0,1100*sizeof(dou_ll));
-
     }
 
     for(int _c=1;_c<=g.nC;_c++)
     {
-        //cout<<el<<"Council "<<_c<<el<<el;
         pt.clear();
         ps.clear();
         int mt1 = -1;
-        /*
-        cout<<"selt: ";
-        for(int _t=1;_t<=g.nProf;_t++)
-        {
-            cout<<selt[_t]<<" ";
-        }
-        cout<<el;
-        cout<<mt1<<el;
-        */
         for(int _t=1;_t<=g.nProf;_t++)
         {
             if(selt[_t]==(ll)(1)) continue;
@@ -235,27 +220,20 @@ int solve(int e, int f)
                 }
             }
         }
-        //cout<<mt1<<el;
         if (mt1 == -1)
         {
             return 0;
         }
         selt[mt1] = 1;
-        //cout<<"Choose first teacher: "<<mt1<<el;
         c[_c].t.push_back(mt1);
 
         vector<int> trash;
-        /*
-        for(auto i: t[mt1].s)
-        {
-            ps.insert(i);
-        }
-        */
         int now = 0;
         while(t[mt1].s[now].next!=1004&&t[mt1].s[now].next!=0)
         {
-            trash.push_back(t[mt1].s[now].next);
             now = t[mt1].s[now].next;
+            if(sels[now]==0)
+                trash.push_back(now);
         }
         ps.resize(1100);
         memset(&ps[0],0,1100*sizeof(dou_ll));
@@ -263,7 +241,6 @@ int solve(int e, int f)
         trash.clear();
         int ms = -1;
         now = 0;
-        //for(auto _s: ps)
         while(ps[now].next!=1004&&ps[now].next!=0)
         {
             int _s = ps[now].next;
@@ -287,37 +264,18 @@ int solve(int e, int f)
         }
         sels[ms] = 1;
         c[_c].s.push_back(ms);
-        /*
-        for(auto _t: s[ms].t)
-        {
-            pt.insert(_t);
-        }
-        */
         trash.clear();
         now = 0;
         while(s[ms].t[now].next!=1004&&s[ms].t[now].next!=0)
         {
-            trash.push_back(s[ms].t[now].next);
             now = s[ms].t[now].next;
+            if(selt[now]==0)
+                trash.push_back(now);
         }
         pt.resize(1100);
         memset(&pt[0],0,1100*sizeof(dou_ll));
         pt_sz = ins(pt,trash);
         trash.clear();
-        //pt.erase(mt);
-        //ps.erase(ms);
-        /*
-        for(int i=0;i<=10;i++)
-        {
-            cout<<ps[i].next<<" ";
-        }
-        cout<<el;
-        for(int i=0;i<=10;i++)
-        {
-            cout<<pt[i].next<<" ";
-        }
-        cout<<el;
-        */
         del(ps,ms);
         ps_sz--;
         del(pt,mt1);
@@ -331,51 +289,49 @@ int solve(int e, int f)
         {
             t[_t].ssz-=del(t[_t].s,ms);
         }
-        //cout<<"\nfirst pair: "<<ms<<" "<<mt1<<el<<flush;
-        /*
+
+        //ps and pt are defined
         for(int i=1;i<=g.nStu;i++)
         {
-            cout<<i<<": "<<flush;
-            int now = 0;
-            //for(auto i: ps)
-            while(s[i].s[now].next!=1004&&s[i].s[now].next!=0)
-            {
-                now = s[i].s[now].next;
-                cout<<now<<" "<<flush;
-            }
-            cout<<el<<flush;
+            if(ps_sz<s[i].ssz)
+                ps_sis[i] = intersection(ps,s[i].s);
+            else
+                ps_sis[i] = intersection(s[i].s,ps);
+
+            if(pt_sz<s[i].tsz)
+                pt_sit[i] = intersection(pt,s[i].t);
+            else
+                pt_sit[i] = intersection(s[i].t,pt);
         }
-        */
-        //return 0;
-        //continue;
+
+        for(int _t=1;_t<=g.nProf;_t++)
+        {
+            if(ps_sz<t[_t].ssz)
+                ps_tts[_t] = intersection(ps,t[_t].s);
+            else
+                ps_tts[_t] = intersection(t[_t].s,ps);
+        }
+
+        bool checks[1100],checkt[1100];
+        memset(checks,0,1100*sizeof(bool));
+        memset(checkt,0,1100*sizeof(bool));
 
         while (1)
         {
             int action = 0;
             int cs = c[_c].s.size();
             int ct = c[_c].t.size();
-            //cout<<"cs: "<<cs<<"\nct: "<<ct<<el<<flush;
             int ms = -1;
             if ( cs >= g.miniStu )
                 action = 1;
             else
             {
                 int now = 0;
-                //for(auto i: ps)
-                /*
-                for(int i=0;i<=10;i++)
-                {
-                    cout<<ps[i].next<<" ";
-                }
-                cout<<el;
-                */
                 while(ps[now].next!=1004&&ps[now].next!=0)
                 {
-                    //if(debug==10) return 0;
-                    //debug++;
                     int i = ps[now].next;
                     now = ps[now].next;
-                    //cout<<"now: "<<now<<el;
+                    if(checks[i]==1) continue;
                     if(sels[i]==1) continue;
 
                     int check = 1;
@@ -395,33 +351,30 @@ int solve(int e, int f)
                             break;
                         }
                     }
-                    if(check==0) continue;
-                    //cout<<"i check successs: "<<i<<el;
-                    lis[i] = intersection(ps,s[i].s); //len(intersection) of student
-                    lit[i] = intersection(pt,s[i].t); //len(intersection) of teacher
+                    if(check==0)
+                    {
+                        checks[i] = 1;
+                        continue;
+                    }
                     /*
-                    cout<<lis[i]<<" "<<lit[i]<<el;
-                    for(int jj=0;jj<=10;jj++)
+                    lis[i] = intersection(ps,s[i].s); //len(intersection) of student
+                    lis1[i] = ps_sis[i];
+                    if(lis[i]!=lis1[i])
                     {
-                        cout<<ps[jj].next<<" ";
+                        cout<<"Sth wrong ps_sis.";exit(0);
                     }
-                    cout<<el;
-                    for(int jj=0;jj<=10;jj++)
-                    {
-                        cout<<pt[jj].next<<" ";
-                    }
-                    cout<<el;
-                    for(int jj=0;jj<=10;jj++)
-                    {
-                        cout<<s[i].s[jj].next<<" ";
-                    }
-                    cout<<el;
-                    for(int jj=0;jj<=10;jj++)
-                    {
-                        cout<<s[i].t[jj].next<<" ";
-                    }
-                    cout<<el;
                     */
+                    lis[i] = ps_sis[i];
+                    /*
+                    lit[i] = intersection(pt,s[i].t); //len(intersection) of teacher
+                    lit1[i] = pt_sit[i];
+                    if(lit[i]!=lit1[i])
+                    {
+                        cout<<"Sth wrong pt_sit.";exit(0);
+                    }
+                    */
+                    lit[i] = pt_sit[i];
+
                     if(lis[i] + cs + 1 < g.miniStu)
                         continue;
                     if(lit[i] + ct < g.miniProf)
@@ -433,20 +386,29 @@ int solve(int e, int f)
                         ms = i;
                     }
                 }
-                //cout<<"ms: "<<ms<<el;
+
                 if (ms==-1)
                     return 0;
                 c[_c].s.push_back(ms);
                 for(int i=1;i<=g.nStu;i++)
                 {
-                    s[i].ssz -= del(s[i].s,ms);
+                    //s[i].ssz -= del(s[i].s,ms);
+                    if(del(s[i].s,ms)==1)
+                    {
+                        ps_sis[i] -= 1;
+                        s[i].ssz -=1;
+                    }
                 }
                 for(int _t=1;_t<=g.nProf;_t++)
                 {
-                    //t[_t].s.erase(ms);
-                    t[_t].ssz -= del(t[_t].s,ms);
+                    //t[_t].ssz -= del(t[_t].s,ms);
+                    if(del(t[_t].s,ms)==1)
+                    {
+                        t[_t].ssz -= 1;
+                        ps_tts[_t] -= 1;
+                    }
                 }
-                //ps.erase(ms);
+
                 del(ps,ms);
                 ps_sz--;
                 s[ms].s.clear();
@@ -462,12 +424,12 @@ int solve(int e, int f)
             else
             {
                 cs = c[_c].s.size();
-                //for(auto _t: pt)
                 int now = 0;
                 while(pt[now].next!=1004&&pt[now].next!=0)
                 {
                     int _t = pt[now].next;
                     now = pt[now].next;
+                    if(checkt[_t]==1) continue;
                     if(selt[_t]==1) continue;
 
                     int check = 1;
@@ -479,9 +441,21 @@ int solve(int e, int f)
                             break;
                         }
                     }
-                    if(check==0) continue;
+                    if(check==0)
+                    {
+                        checkt[_t] = 1;
+                        continue;
+                    }
 
+                    /*
                     lis[_t] = intersection(ps,t[_t].s);
+                    lis1[_t] = ps_tts[_t];
+                    if(lis[_t]!=lis1[_t])
+                    {
+                        cout<<"Sth wrong ps_tts.";exit(0);
+                    }
+                    */
+                    lis[_t] = ps_tts[_t];
                     if(lis[_t] + cs <g.miniStu)
                         continue;
                     if(mt==-1)
@@ -492,31 +466,26 @@ int solve(int e, int f)
                 if(mt==-1)
                     return 0;
                 c[_c].t.push_back(mt);
-                //pt.erase(mt);
-                if(mt==117)
-                {
-                    //cout<<el<<"mt"<<el;
-                }
                 del(pt,mt);
                 pt_sz--;
                 for(int i=1;i<=g.nStu;i++)
                 {
-                    //s[i].t.erase(mt);
-                    s[i].tsz -= del(s[i].t,mt);
+                    //s[i].tsz -= del(s[i].t,mt);
+                    if(del(s[i].t,mt)==1)
+                    {
+                        pt_sit[i] -= 1;
+                        s[i].tsz -= 1;
+                    }
                 }
                 t[mt].s.clear();
-                //cout<<mt<<el;
                 selt[mt] = 1;
-                //cout<<"selt["<<mt<<"]="<<selt[mt]<<el;
             }
             //cout<<"choose teacher and student: "<<mt<<" "<<ms<<el<<flush;
             if (action==2)
                 break;
         }
         now = 0;
-        //cout<<el<<el<<"OKE OKE"<<el<<el<<flush;
         trash.clear();
-        //cout<<el<<el<<"OKE OKE"<<el<<el<<flush;
         while(ps[now].next!=1004&&ps[now].next!=0)
         {
             now = ps[now].next;
@@ -524,7 +493,6 @@ int solve(int e, int f)
         }
         c[_c].ps_sz = ins(c[_c].ps,trash);
         trash.clear();
-        //cout<<el<<el<<"OKE OKE"<<el<<el<<flush;
         now = 0;
         while(pt[now].next!=1004&&pt[now].next!=0)
         {
@@ -533,21 +501,34 @@ int solve(int e, int f)
         }
         c[_c].pt_sz = ins(c[_c].pt,trash);
         trash.clear();
-        //cout<<el<<el<<"OKE OKE"<<el<<el<<flush;
-        /*
-        for(auto i: ps)
-            c[_c].ps.insert(i);
-        for(auto _t: pt)
-            c[_c].pt.insert(_t);
-        */
     }
-    //return 0;
+
+    for(int i=1;i<=g.nStu;i++)
+    {
+        if(sels[i]==1)
+        {
+            for(int _c=1;_c<=g.nC;_c++)
+            {
+                c[_c].ps_sz -= del(c[_c].ps,i);
+            }
+        }
+    }
+
+    for(int _t = 1; _t <= g.nProf ; _t++)
+    {
+        if(selt[_t]==1)
+        {
+            for(int _c=1;_c<=g.nC;_c++)
+            {
+                c[_c].pt_sz -= del(c[_c].pt,_t);
+            }
+        }
+    }
 
     for(int _t = 1; _t <= g.nProf ; _t++)
     {
         if(selt[_t]==0)
         {
-            //cout<<"teacher t: "<<_t<<endl<<flush;
             int mc = -1;
             for(int _c=1;_c<=g.nC;_c++)
             {
@@ -572,7 +553,6 @@ int solve(int e, int f)
                     mc = _c;
                 }
             }
-            //cout<<mc<<endl<<flush;
             if(mc==-1)
             {
                 return 0;
@@ -581,7 +561,6 @@ int solve(int e, int f)
             for(int _c=1;_c<=g.nC;_c++)
             {
                 c[_c].pt_sz -= del(c[_c].pt,_t);
-                //c[_c].pt.erase(_t);
             }
             selt[_t] = 1;
         }
@@ -614,8 +593,9 @@ int solve(int e, int f)
                     }
                 }
                 if(check==0) continue;
-                lis[_c] = intersection(s[i].s,c[_c].ps);
-                lit[_c] = intersection(s[i].t,c[_c].pt);
+                lis[_c] = intersection(c[_c].ps,s[i].s);
+                lit[_c] = intersection(c[_c].pt,s[i].t);
+
                 if(mc==-1)
                 {
                     mc = _c;
@@ -628,37 +608,16 @@ int solve(int e, int f)
             for(int _c=1;_c<=g.nC;_c++)
             {
                 c[_c].ps_sz -= del(c[_c].ps,i);
-                //c[_c].ps.erase(i);
             }
             sels[i] = 1;
         }
     }
-    //cout<<el;
-
-    /*
-    cout<<"Finish"<<endl;
-    for(int _c=1;_c<=g.nC;_c++)
-    {
-        cout<<"Council "<<_c<<el;
-        for(auto i: c[_c].s)
-        {
-            cout<<i<<" ";
-        }
-        cout<<el;
-        for(auto _t: c[_c].t)
-        {
-            cout<<_t<<" ";
-        }
-        cout<<el;
-    }
-    */
-    //cout<<el;
 
     return 1;
 }
 
-bool arr1[100'00];
-bool arr2[100'00];
+bool arr1[100'000'000];
+bool arr2[100'000'000];
 
 vector<int> prj_val;
 vector<int> prf_val;
@@ -673,7 +632,11 @@ void input()
         {
             int gg;
             cin>>gg;
-            //if (i==j) continue;
+            if (i==j)
+            {
+                g.prj[i][j] = -1;
+                continue;
+            }
             g.prj[i][j] = gg;
             if(gg<100'000'000)
             {
@@ -725,16 +688,29 @@ void input()
     int _e = prj_val[0];
     int _f = prf_val[0];
 
+    clock_t BeginTime = clock();
+
+    clock_t TrueSolve = 0;
+    clock_t FalseSolve = 0;
+    int ide = 0;
+    int idf = 0;
+
+    clock_t t;
+
     while(left<=right)
     {
         mid = (left+right)/2;
+        t = clock();
         if (solve(prj_val[mid],_f)==1)
         {
+            TrueSolve += clock()-t;
             left = mid + 1;
             _e = max(prj_val[mid],_e);
+            ide = mid;
         }
         else
         {
+            FalseSolve += clock()-t;
             right = mid - 1;
         }
     }
@@ -744,13 +720,17 @@ void input()
     while(left<=right)
     {
         mid = (left+right)/2;
+        t = clock();
         if(solve(_e,prf_val[mid])==1)
         {
             _f = max(prf_val[mid],_f);
             left = mid + 1;
+            idf = mid;
+            TrueSolve += clock()-t;
         }
         else
         {
+            FalseSolve += clock()-t;
             right = mid - 1;
         }
     }
@@ -760,25 +740,44 @@ void input()
         cout<<"No solution"<<el;
         exit(0);
     }
-    cout<<"e and f are:\n"<<_e<<" "<<_f<<"\n";
+
+    cout<<"e and f are:\n"<<_e<<" "<<_f<<"\n\n";
+
+    int ans = 0;
+    /*
+    cout<<"Index of e: "<<ide<<el;
+    cout<<"Index of f: "<<idf<<el;
+    cout<<"True solve time: "<<double(TrueSolve)/double(CLOCKS_PER_SEC)<<"s.";
+    cout<<"False solve time: "<<double(FalseSolve)/double(CLOCKS_PER_SEC)<<"s.";
+    */
 
     for(int _c=1;_c<=g.nC;_c++)
     {
         cout<<"Council "<<_c<<el;
-        cout<<"Project: "<<el;
+        cout<<c[_c].s.size()<<" project: "<<el;
         for(auto i: c[_c].s)
         {
             cout<<i<<" ";
+            for(auto j: c[_c].s)
+            {
+                if(i!=j)
+                    ans += g.prj[i][j];
+            }
         }
         cout<<el;
-        cout<<"Teacher: "<<el;
+        cout<<c[_c].t.size()<<" teacher: "<<el;
         for(auto _t: c[_c].t)
         {
             cout<<_t<<" ";
+            for(auto i: c[_c].s)
+            {
+                ans += g.prf[_t][i];
+            }
         }
-        cout<<el;
+        cout<<el<<el;
     }
-
+    cout<<el<<el<<"Answer is: "<<ans<<el;
+    cout<<"Solve in "<<double(clock()-BeginTime)/double(CLOCKS_PER_SEC)<<"s.";
 }
 
 signed main()
@@ -792,5 +791,6 @@ signed main()
     while(test--)
     {
         input();
+
     }
 }
