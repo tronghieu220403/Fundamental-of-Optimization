@@ -683,6 +683,8 @@ void input()
     sort(prf_val.begin(),prf_val.end());
     prj_val.resize(std::distance(prj_val.begin(),std::unique(prj_val.begin(), prj_val.end())));
     prf_val.resize(std::distance(prf_val.begin(),std::unique(prf_val.begin(), prf_val.end())));
+    sort(prj_val.begin(),prj_val.end());
+    sort(prf_val.begin(),prf_val.end());
     int left = 0; int right = prj_val.size()-1;
     int mid = 0;
     int _e = prj_val[0];
@@ -697,12 +699,18 @@ void input()
 
     clock_t t;
 
+    int check = 0;
+
     while(left<=right)
     {
-        mid = (left+right)/2;
+        if (check==0)
+            mid = left + (right-left)/4;
+        else
+            mid = left + (right-left)/2;
         t = clock();
         if (solve(prj_val[mid],_f)==1)
         {
+            check = 0;
             TrueSolve += clock()-t;
             left = mid + 1;
             _e = max(prj_val[mid],_e);
@@ -710,19 +718,26 @@ void input()
         }
         else
         {
+            check = 1;
             FalseSolve += clock()-t;
             right = mid - 1;
         }
     }
     left = 0;right = prf_val.size()-1;
     mid = 0;
-
+    check = 0;
     while(left<=right)
     {
-        mid = (left+right)/2;
+        if (check==0)
+            mid = left + (right-left)/4;
+        else
+            mid = left + (right-left)/2;
+
+        mid = left + (right-left)/4;
         t = clock();
         if(solve(_e,prf_val[mid])==1)
         {
+            check = 0;
             _f = max(prf_val[mid],_f);
             left = mid + 1;
             idf = mid;
@@ -730,6 +745,7 @@ void input()
         }
         else
         {
+            check = 1;
             FalseSolve += clock()-t;
             right = mid - 1;
         }
@@ -785,7 +801,7 @@ signed main()
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     freopen("1.inp","r",stdin);
-    freopen("1.out","w",stdout);
+    freopen("3.out","w",stdout);
     int test = 1;
     //cin>>test;
     while(test--)

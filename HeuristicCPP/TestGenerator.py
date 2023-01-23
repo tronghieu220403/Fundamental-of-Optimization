@@ -161,11 +161,11 @@ def Generate(nStu, nProf, nCouncil):
 
     return 1
 
-def check():
+def check(fileOut = "1.out",fileIn = "1.inp"):
     print("Checking your answer...")
     global finp 
-    finp = open("1.out","r")
-    x = CP("1.inp")
+    finp = open(fileOut,"r")
+    x = CP(fileIn)
     StuData, PrfData = x.ReadInput()
     l = read()
     if l == -1:
@@ -206,14 +206,20 @@ def check():
     print("No error found.")
     return
 
-def CheckOnly(x=0):
+def CheckOnly(x=0,fileOut = "1.out",fileIn = "1.inp"):
     if x==1:
         BeginTime = time.time()
         os.system("1.exe")
         print(f"Solve in {time.time()-BeginTime}s.")
-    check()
+    check(fileOut,fileIn)
 
 #Generate input to 1.inp and check the result.
 #GenerateAndCheck(30,500,500) #n and m are number of students and number of teachers
-#Generate(1000,1000,35)
-CheckOnly() #if you already have an input file "1.inp", you can check your code with that test case by using this.
+Test = 1
+for _ in range(Test):
+    print("Test case "+str(_))
+    while(True):
+        if Generate(500,500,r(25,15))==1:
+            break
+    CheckOnly(1) #if you already have an input file "1.inp", you can check your code with that test case by using this.
+    print(flush=True)
