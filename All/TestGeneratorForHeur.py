@@ -32,10 +32,10 @@ def Generate(nStu, nProf, nCouncil):
 
     Guide = [0 for _ in range(nStu)]
 
-    minStu = max(nStu//nCouncil*3//4,r(nStu//nCouncil- (r(max(nStu//nCouncil-2,1),1))//2,2))
+    minStu = max(max(nStu//nCouncil*3//4,r(nStu//nCouncil- (r(max(nStu//nCouncil-2,1),1))//2,2)),1)
     maxStu = minStu + r(max(2,nStu-nCouncil*minStu), 2)
     
-    minProf = max(nProf//nCouncil*3//4,r(nProf//nCouncil- (r(max(nProf//nCouncil-2,1),1)//2),2))
+    minProf = max(max(nProf//nCouncil*3//4,r(nProf//nCouncil- (r(max(nProf//nCouncil-2,1),1)//2),2)),1)
     maxProf = minProf + r(max(2,nProf-nCouncil*minProf),2)
 
     nCS = [0 for _  in range(nCouncil)]
@@ -208,10 +208,13 @@ def check(fileOut = "HeuristicAns.out",fileIn = "data.inp"):
     print("No error found.")
     return
 
-def CheckOnly(x=0,fileOut = "HeuristicAns.out",fileIn = "data.inp"):
+def CheckOnly(_N,_M,x=0,fileOut = "HeuristicAns.out",fileIn = "data.inp"):
     if x==1:
         BeginTime = time.time()
-        os.system("Heuristic.exe")
+        if _N*(_N+_M) <= 5000:
+            os.system("python HeuristicSolverForSmallData.py")
+        else:
+            os.system("Heuristic.exe")
         print(f"Solve in {time.time()-BeginTime}s.")
     check(fileOut,fileIn)
 
@@ -220,7 +223,9 @@ def CheckOnly(x=0,fileOut = "HeuristicAns.out",fileIn = "data.inp"):
 Test = 1
 for _ in range(Test):
     print("Test case "+str(_))
+    _N = 40
+    _M = 75
     while(True):
-        if Generate(100,100,r(7,9))==1:
+        if Generate(_N,_M,r(7,9))==1:
             break
-    CheckOnly(1) #if you already have an input file "data.inp", you can check your code with that test case by using this.
+    CheckOnly(_N,_M,1) #if you already have an input file "data.inp", you can check your code with that test case by using this.

@@ -116,45 +116,26 @@ def solve(e, f, getMax = 0):
     solver = cp_model.CpSolver()
     
     if getMax == 1:
-        class SolutionPrinter(cp_model.CpSolverSolutionCallback):
-            """Print intermediate solutions."""
-
-            def __init__(self):
-                cp_model.CpSolverSolutionCallback.__init__(self)
-
-            # calculate solution here
-            def on_solution_callback(self):
-                _cs = [[0 for _ in range(nStu)] for __ in range(nCouncil)]
-                _ct = [[0 for _ in range(nProf)] for __ in range(nCouncil)]
-                _table = [[[] for __ in range(2)] for _ in range(nCouncil)]
-                _ans = 0
-                for b in range(nCouncil):
-                    for i in range(nStu):
-                        if self.BooleanValue(cs[b][i]) > 0:
-                            _table[b][0].append(i)
-                    for t in range(nProf):
-                        if self.BooleanValue(ct[b][t]) > 0:
-                            _table[b][1].append(t)
-                
-                for b in range(nCouncil):
-                    for i in _table[b][0]:
-                        for j in _table[b][0]:
-                            if i!=j:
-                                _ans += PrjData[i][j]    
-                        for t in _table[b][1]:
-                            _ans += PrfData[t][i]
-
-                global table
-                global ans
-                if (ans<_ans):
-                    table = _table
-                    ans = _ans
-        
-                return
-
         solver.parameters.enumerate_all_solutions = False
-        callback = SolutionPrinter()
-        status = solver.Solve(model,callback)
+        status = solver.Solve(model)
+        global table
+        global ans
+        ans = 0
+        for b in range(nCouncil):
+            for i in range(nStu):
+                if solver.BooleanValue(cs[b][i]) > 0:
+                    table[b][0].append(i)
+            for t in range(nProf):
+                if solver.BooleanValue(ct[b][t]) > 0:
+                    table[b][1].append(t)
+        for b in range(nCouncil):
+            for i in table[b][0]:
+                for j in table[b][0]:
+                    if i!=j:
+                        ans += PrjData[i][j]    
+                for t in table[b][1]:
+                    ans += PrfData[t][i]
+
     else:
         solver.parameters.enumerate_all_solutions = False
         status = solver.Solve(model)
