@@ -32,10 +32,10 @@ def Generate(nStu, nProf, nCouncil):
 
     Guide = [0 for _ in range(nStu)]
 
-    minStu = max(nStu//nCouncil*3//4,r(nStu//nCouncil- (r(max(nStu//nCouncil-2,1),1))//2,2))
+    minStu = max(max(nStu//nCouncil*3//4,r(nStu//nCouncil- (r(max(nStu//nCouncil-2,1),1))//2,2)),1)
     maxStu = minStu + r(max(2,nStu-nCouncil*minStu), 2)
     
-    minProf = max(nProf//nCouncil*3//4,r(nProf//nCouncil- (r(max(nProf//nCouncil-2,1),1)//2),2))
+    minProf = max(max(nProf//nCouncil*3//4,r(nProf//nCouncil- (r(max(nProf//nCouncil-2,1),1)//2),2)),1)
     maxProf = minProf + r(max(2,nProf-nCouncil*minProf),2)
 
     nCS = [0 for _  in range(nCouncil)]
