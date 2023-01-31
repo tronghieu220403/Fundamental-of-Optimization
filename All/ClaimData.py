@@ -18,8 +18,9 @@ def read(finp):
     while True:
         xx = finp.readline()
         if "No" in xx:
-            print("No solution.")
-            exit()
+            #print("No solution.")
+            finp.close()
+            return -1
         if len(xx) == 1 or "C" in xx or ":" in xx:
             continue
         return list(map(int, xx.split()))
@@ -157,19 +158,18 @@ def Generate(nStu, nProf, nCouncil):
     w()
     fout.close()
 
-    print("Generated.",flush=True)
+    #print("Generated.",flush=True)
 
     return 1
 
 def check(fileOut,fileIn = "data.inp"):
-    print("Checking your answer...")
-    print(fileOut)
+    #print("Checking your answer...")
     finp = open(fileOut,"r")
     x = CP(fileIn)
     StuData, PrfData = x.ReadInput()
     l = read(finp)
     if l == -1:
-        return 1
+        return ["N/A" for _ in range(4)]
     #print(l)
     e, f = l[0],l[1]
     nCouncil = x.GetValue("nCouncil")
@@ -206,46 +206,90 @@ def check(fileOut,fileIn = "data.inp"):
     if sum(len(PrfData1[i]) for i in range(nCouncil))!=nProf:
         raise ValueError(f'Not enough teacher: {sum(len(PrfData1[i]) for i in range(nCouncil))} {nProf}')
 
-    print("No error found.")
+    #print("No error found.")
     while(True):
         xx = finp.readline()
         if "in" in xx:
             finp.close()
-            return [e, f, ans, xx[len("Solve in "):]]  
+            return [e, f, ans, xx[len("Solve in "):-1]]  
     
 
 def CheckOnlyHeu(_N,_M,x=0,fileOut = "HeuristicAns.out",fileIn = "data.inp"):
     if x==1:
         BeginTime = time.time()
         if _N*(_N+_M) <= 5000:
-            os.system("python HeuristicSolverForSmallData.py")
+            os.popen("python HeuristicSolverForSmallData.py").read()
         else:
-            os.system("Heuristic.exe")
+            os.popen("Heuristic.exe").read()
         #print(f"Solve in {time.time()-BeginTime}s.")
     return check(fileOut,fileIn)
 
 def CheckOnlyCP(x=0,fileOut = "CorrectAns.out",fileIn = "data.inp"):
     if x==1:
         BeginTime = time.time()
-        os.system("python Correct_CP_SAT_Solver.py")
+        os.popen("python Correct_CP_SAT_Solver.py").read()
         #print(f"Solve in {time.time()-BeginTime}s.")
     return check(fileOut,fileIn)
 
 
 #Generate input to data.inp and check the result.
 #GenerateAndCheck(30,500,500) #n and m are number of students and number of teachers
-Test = 1
+Test = 100
 
 wData = open("RunData.out","w")
 
-for _ in range(Test):
+import math
+
+for _ in range(10,18):
     print("Test case "+str(_))
-    _N = 10
-    _M = 10
+    _N = _
+    _M = _
+    if _N <=100:
+        _K = r(int(math.sqrt(_N)),int(math.sqrt(_N)))
+    else:
+        _K = r(int(math.sqrt(_N))//10*10-5,int(math.sqrt(_N))//10*10+5)
     while(True):
-        if Generate(_N,_M,r(3,2))==1:
+        if Generate(_N,_M,_K)==1:
             break
     h = CheckOnlyHeu(_N,_M,1)
-    t = CheckOnlyCP(1)
-    wData.write(f"{t[0]},{t[1]},{t[2]},{t[3]},{h[0]},{h[1]},{h[2]},{h[0]/t[0]},{h[1]/t[1]},{h[2]/t[2]},{h[3]}")
+    if "N/A" == h[0]:
+        wData.write(f"{_N},{_M},{_K},N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A\n")
+        wData.flush()
+        continue
+    if _N <= 20 and _M <=20:
+        t = CheckOnlyCP(1)
+    else:
+        t = ["N/A" for _ in range(4)]
+    if "N/A" == t[0]:
+        wData.write(f"{_N},{_M},{_K},N/A,N/A,N/A,N/A,{h[0]},{h[1]},{h[2]},N/A,N/A,N/A,,{h[3]}\n")
+    else:
+        wData.write(f"{_N},{_M},{_K},{t[0]},{t[1]},{t[2]},{t[3]},{h[0]},{h[1]},{h[2]},{h[0]/t[0]},{h[1]/t[1]},{h[2]/t[2]},{h[3]}\n")
+    wData.flush()
+    #if you already have an input file "data.inp", you can check your code with that test case by using this.
+
+for _ in range(1,Test+1):
+    print("Test case "+str(_*10))
+    _N = 10*_
+    _M = 10*_
+    if _N <=100:
+        _K = r(int(math.sqrt(_N)),int(math.sqrt(_N)))
+    else:
+        _K = r(int(math.sqrt(_N))//10*10-5,int(math.sqrt(_N))//10*10+5)
+    while(True):
+        if Generate(_N,_M,_K)==1:
+            break
+    h = CheckOnlyHeu(_N,_M,1)
+    if "N/A" == h[0]:
+        wData.write(f"{_N},{_M},{_K},N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A\n")
+        wData.flush()
+        continue
+    if _N <= 20 and _M <=20:
+        t = CheckOnlyCP(1)
+    else:
+        t = ["N/A" for _ in range(4)]
+    if "N/A" == t[0]:
+        wData.write(f"{_N},{_M},{_K},N/A,N/A,N/A,N/A,{h[0]},{h[1]},{h[2]},N/A,N/A,N/A,{h[3]}\n")
+    else:
+        wData.write(f"{_N},{_M},{_K},{t[0]},{t[1]},{t[2]},{t[3]},{h[0]},{h[1]},{h[2]},{h[0]/t[0]},{h[1]/t[1]},{h[2]/t[2]},{h[3]}\n")
+    wData.flush()
     #if you already have an input file "data.inp", you can check your code with that test case by using this.

@@ -180,6 +180,12 @@ fright = len(fArr)-1
 eright = len(eArr)-1
 mid = 0
 
+fileOut = "CorrectAns.out"
+fout = open(fileOut,"w")
+def w(x="",end='\n'):
+    fout.write(format(x))
+    fout.write(end)
+
 emax = -1
 
 RunTime = 0
@@ -193,7 +199,7 @@ while(eleft<=eright):
         eright = mid - 1
 
 if emax == -1:
-    print("No solution")
+    w("No solution")
     exit()
 
 fmax = -1
@@ -207,20 +213,15 @@ while(fleft<=fright):
         fright = mid - 1
 
 if fmax == -1:
-    print("No solution")
+    w("No solution")
     exit()
 
 if (solve(eArr[emax],fArr[fmax],1) == 0):
-    print("No solution")
+    w("No solution")
     exit()
     
 EndTime = time.time()
 
-fileOut = "CorrectAns.out"
-fout = open(fileOut,"w")
-def w(x="",end='\n'):
-    fout.write(format(x))
-    fout.write(end)
 
 w(f"Maximum value of e and f are:\n{eArr[emax]} {fArr[fmax]}\n")
 print(f"Maximum value of and f are {eArr[emax]} and {fArr[fmax]}")
