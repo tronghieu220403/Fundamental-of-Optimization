@@ -115,9 +115,10 @@ def solve(e, f, getMax = 0):
 
     solver = cp_model.CpSolver()
     
+    solver.parameters.enumerate_all_solutions = False
+    status = solver.Solve(model)
+
     if getMax == 1:
-        solver.parameters.enumerate_all_solutions = False
-        status = solver.Solve(model)
         global table
         global ans
         ans = 0
@@ -136,9 +137,6 @@ def solve(e, f, getMax = 0):
                 for t in table[b][1]:
                     ans += PrfData[t][i]
 
-    else:
-        solver.parameters.enumerate_all_solutions = False
-        status = solver.Solve(model)
     
     if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
         return 0
