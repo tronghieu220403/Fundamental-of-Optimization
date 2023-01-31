@@ -130,8 +130,8 @@ def Generate(nStu, nProf, nCouncil):
         return
 
     w(str(nStu) + " " + str(nProf) + " " + str(nCouncil))
-    minMatchPrj = r(15000000,500)
-    minMatchPrf = r(15000000,500)
+    minMatchPrj = r(1500,500)
+    minMatchPrf = r(1500,500)
     w(str(minStu) + " " + str(maxStu) + " " + str(minProf) + " " + str(maxProf) + " " + str(minMatchPrj) + " " + str(minMatchPrf))
     
     for i in range(nStu):
