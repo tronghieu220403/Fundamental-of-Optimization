@@ -2,7 +2,7 @@ from random import *
 from Project26Ex import CP
 def r(x,y=0):
     if y>x:
-        y = x-1
+        y,x = x,y
     return randint(y,x)
 
 from ortools.sat.python import cp_model

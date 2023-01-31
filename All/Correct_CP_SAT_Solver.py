@@ -153,14 +153,17 @@ def solve(e, f, getMax = 0):
                 return
 
         solver.parameters.enumerate_all_solutions = True
+        solver.parameters.max_time_in_seconds = 60.0
         callback = SolutionPrinter()
         status = solver.Solve(model,callback)
+        if status not in [cp_model.OPTIMAL]:
+            return 0
     else:
         solver.parameters.enumerate_all_solutions = False
         status = solver.Solve(model)
-    
-    if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
-        return 0
+        if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
+            return 0
+
     return 1
 
 
@@ -207,8 +210,10 @@ if fmax == -1:
     print("No solution")
     exit()
 
-solve(eArr[emax],fArr[fmax],1)
-
+if (solve(eArr[emax],fArr[fmax],1) == 0):
+    print("No solution")
+    exit()
+    
 EndTime = time.time()
 
 fileOut = "CorrectAns.out"

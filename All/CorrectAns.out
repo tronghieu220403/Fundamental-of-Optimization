@@ -1,24 +1,18 @@
 Maximum value of e and f are:
-12184600 7011105
+1159 1434
 
 Council 1:
-7 project:
-3 6 8 9 10 11 12 
-7 teacher:
-5 6 7 11 12 13 14 
+5 project:
+6 7 8 9 10 
+6 teacher:
+2 3 4 5 8 10 
 
 Council 2:
 5 project:
-13 14 15 16 17 
+1 2 3 4 5 
 4 teacher:
-4 8 15 17 
-
-Council 3:
-5 project:
-1 2 4 5 7 
-6 teacher:
-1 2 3 9 10 16 
+1 6 7 9 
 
 
-Answer is: 2553282618
-Solve in 0.0s
+Answer is: 179615
+Solve in 0.1577906608581543s

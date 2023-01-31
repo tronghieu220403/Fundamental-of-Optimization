@@ -1,7 +1,7 @@
 from random import *
 from Project26Ex import CP
 def r(x,y=0):
-    if(y>=x):
+    if y>x:
         y,x = x,y
     return randint(y,x)
 
@@ -13,10 +13,8 @@ BeginTime = time.time()
 
 import os
 
-finp = 0
 
-def read():
-    global finp
+def read(finp):
     while True:
         xx = finp.readline()
         if "No" in xx:
@@ -163,13 +161,13 @@ def Generate(nStu, nProf, nCouncil):
 
     return 1
 
-def check(fileOut = "CorrectAns.out",fileIn = "data.inp"):
+def check(fileOut,fileIn = "data.inp"):
     print("Checking your answer...")
-    global finp 
+    print(fileOut)
     finp = open(fileOut,"r")
     x = CP(fileIn)
     StuData, PrfData = x.ReadInput()
-    l = read()
+    l = read(finp)
     if l == -1:
         return 1
     #print(l)
@@ -178,21 +176,24 @@ def check(fileOut = "CorrectAns.out",fileIn = "data.inp"):
     nStu = x.GetValue("nStu")
     nProf = x.GetValue("nProf")
     StuData1 = [0 for _ in range(nCouncil)]
-    PrfData1 = [0 for _ in range(nCouncil)] 
+    PrfData1 = [0 for _ in range(nCouncil)]
+    ans = 0
     for b in range(nCouncil):
-        Stu = read()
-        Prf = read()
+        Stu = read(finp)
+        Prf = read(finp)
         StuData1[b] = Stu
         PrfData1[b] = Prf
         for i in Stu:
             for j in Stu:
                 if i!=j:
+                    ans += StuData[i-1][j-1]
                     if StuData[i-1][j-1] < e:
                         raise ValueError(f'Wrong in StuData: {i} {j}: {StuData[i-1][j-1]} < {e}')
             for t in Prf:
+                ans += PrfData[t-1][i-1]
                 if PrfData[t-1][i-1] < f:
                     raise ValueError(f'Wrong in PrfData: {t} {i}: {PrfData[t-1][i-1]} < {f}')
-    finp.close()
+
     for i in range(nCouncil):
         for j in range(i+1,nCouncil):
             if len(set(StuData1[i]).intersection(set(StuData1[j]))) != 0:
@@ -206,22 +207,45 @@ def check(fileOut = "CorrectAns.out",fileIn = "data.inp"):
         raise ValueError(f'Not enough teacher: {sum(len(PrfData1[i]) for i in range(nCouncil))} {nProf}')
 
     print("No error found.")
-    return
+    while(True):
+        xx = finp.readline()
+        if "in" in xx:
+            finp.close()
+            return [e, f, ans, xx[len("Solve in "):]]  
+    
 
-def CheckOnly(x=0,fileOut = "CorrectAns.out",fileIn = "data.inp"):
+def CheckOnlyHeu(_N,_M,x=0,fileOut = "HeuristicAns.out",fileIn = "data.inp"):
+    if x==1:
+        BeginTime = time.time()
+        if _N*(_N+_M) <= 5000:
+            os.system("python HeuristicSolverForSmallData.py")
+        else:
+            os.system("Heuristic.exe")
+        #print(f"Solve in {time.time()-BeginTime}s.")
+    return check(fileOut,fileIn)
+
+def CheckOnlyCP(x=0,fileOut = "CorrectAns.out",fileIn = "data.inp"):
     if x==1:
         BeginTime = time.time()
         os.system("python Correct_CP_SAT_Solver.py")
         #print(f"Solve in {time.time()-BeginTime}s.")
-    check(fileOut,fileIn)
+    return check(fileOut,fileIn)
+
 
 #Generate input to data.inp and check the result.
 #GenerateAndCheck(30,500,500) #n and m are number of students and number of teachers
 Test = 1
+
+wData = open("RunData.out","w")
+
 for _ in range(Test):
     print("Test case "+str(_))
+    _N = 10
+    _M = 10
     while(True):
-        if Generate(17,17,r(3,5))==1:
+        if Generate(_N,_M,r(3,2))==1:
             break
-    CheckOnly(1) #if you already have an input file "data.inp", you can check your code with that test case by using this.
-    print(flush=True,end="")
+    h = CheckOnlyHeu(_N,_M,1)
+    t = CheckOnlyCP(1)
+    wData.write(f"{t[0]},{t[1]},{t[2]},{t[3]},{h[0]},{h[1]},{h[2]},{h[0]/t[0]},{h[1]/t[1]},{h[2]/t[2]},{h[3]}")
+    #if you already have an input file "data.inp", you can check your code with that test case by using this.
