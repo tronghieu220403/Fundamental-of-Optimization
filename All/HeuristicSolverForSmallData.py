@@ -20,7 +20,7 @@ def r():
             continue
         return list(map(int, xx.split()))
         
-for i in range(nStu):
+for i in range(nStu): 
     PrjData[i] = r()
 
 PrfData = [[] for i in range(nProf) ]
@@ -152,7 +152,7 @@ def solve(e, f, getMax = 0):
         
                 return
 
-        solver.parameters.enumerate_all_solutions = True
+        solver.parameters.enumerate_all_solutions = False
         callback = SolutionPrinter()
         status = solver.Solve(model,callback)
     else:
@@ -162,7 +162,7 @@ def solve(e, f, getMax = 0):
     if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
         return 0
     return 1
-
+    
 
 eMax = 0
 fMax = 0
@@ -209,9 +209,7 @@ if fmax == -1:
 
 solve(eArr[emax],fArr[fmax],1)
 
-EndTime = time.time()
-
-fileOut = "CorrectAns.out"
+fileOut = "HeuristicAns.out"
 fout = open(fileOut,"w")
 def w(x="",end='\n'):
     fout.write(format(x))
@@ -240,6 +238,8 @@ for b in range(nCouncil):
                 ans += PrjData[i][j]    
         for t in table[b][1]:
             ans += PrfData[t][i]
+
+EndTime = time.time()
 
 w()
 print(f"Answer is: {ans}")
