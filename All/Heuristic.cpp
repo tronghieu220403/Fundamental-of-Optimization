@@ -74,7 +74,7 @@ Council c[1104];
 struct info
 {
     int nStu,nProf,nC;
-    int miniStu, maxStu, miniProf, maxProf, minMatchStu, minMachProf;
+    int miniStu, maxStu, miniProf, maxProf, minMatchStu, minMatchProf;
     int prj[1104][1104], prf[1104][1104];
     int g[1104];
 };
@@ -117,7 +117,7 @@ int ps_tts[1100];
 int solve(int e, int f)
 {
     g.minMatchStu = e;
-    g.minMachProf = f;
+    g.minMatchProf = f;
 
     //cout<<endl<<"e and f is: ";
     //cout<<e<<" "<<f<<el<<flush;
@@ -152,7 +152,7 @@ int solve(int e, int f)
         s[i].ssz = ins(s[i].s,trash);
         for (int _t=1;_t<=g.nProf;_t++)
         {
-            if (g.prf[_t][i]>=g.minMachProf)
+            if (g.prf[_t][i]>=g.minMatchProf)
             {
                 //s[i].t.insert(_t);
                 trash1.push_back(_t);
@@ -167,7 +167,7 @@ int solve(int e, int f)
     {
         for (int i=1;i<=g.nStu;i++)
         {
-            if (g.prf[_t][i]>=g.minMachProf)
+            if (g.prf[_t][i]>=g.minMatchProf)
             {
                 //t[_t].s.insert(i);
                 trash.push_back(i);
@@ -213,10 +213,9 @@ int solve(int e, int f)
             {
                 if(mt1==-1)
                     mt1 = _t;
-                else
+                else if(t[_t].ssz>t[mt1].ssz)
                 {
-                    if(t[_t].ssz>t[mt1].ssz)
-                        mt1 = _t;
+                    mt1 = _t;
                 }
             }
         }
@@ -264,6 +263,7 @@ int solve(int e, int f)
         }
         sels[ms] = 1;
         c[_c].s.push_back(ms);
+
         trash.clear();
         now = 0;
         while(s[ms].t[now].next!=1004&&s[ms].t[now].next!=0)
@@ -337,7 +337,7 @@ int solve(int e, int f)
                     int check = 1;
                     for(auto _t: c[_c].t)
                     {
-                        if(g.prf[_t][i]<g.minMachProf)
+                        if(g.prf[_t][i]<g.minMatchProf)
                         {
                             check = 0;
                             break;
@@ -356,23 +356,7 @@ int solve(int e, int f)
                         checks[i] = 1;
                         continue;
                     }
-                    /*
-                    lis[i] = intersection(ps,s[i].s); //len(intersection) of student
-                    lis1[i] = ps_sis[i];
-                    if(lis[i]!=lis1[i])
-                    {
-                        cout<<"Sth wrong ps_sis.";exit(0);
-                    }
-                    */
                     lis[i] = ps_sis[i];
-                    /*
-                    lit[i] = intersection(pt,s[i].t); //len(intersection) of teacher
-                    lit1[i] = pt_sit[i];
-                    if(lit[i]!=lit1[i])
-                    {
-                        cout<<"Sth wrong pt_sit.";exit(0);
-                    }
-                    */
                     lit[i] = pt_sit[i];
 
                     if(lis[i] + cs + 1 < g.miniStu)
@@ -380,7 +364,9 @@ int solve(int e, int f)
                     if(lit[i] + ct < g.miniProf)
                         continue;
                     if(ms==-1)
+                    {
                         ms = i;
+                    }
                     else if(lis[i]+lit[i]>lis[ms]+lit[ms])
                     {
                         ms = i;
@@ -390,9 +376,9 @@ int solve(int e, int f)
                 if (ms==-1)
                     return 0;
                 c[_c].s.push_back(ms);
+
                 for(int i=1;i<=g.nStu;i++)
                 {
-                    //s[i].ssz -= del(s[i].s,ms);
                     if(del(s[i].s,ms)==1)
                     {
                         ps_sis[i] -= 1;
@@ -435,7 +421,7 @@ int solve(int e, int f)
                     int check = 1;
                     for (auto i: c[_c].s)
                     {
-                        if(g.prf[_t][i]<g.minMachProf)
+                        if(g.prf[_t][i]<g.minMatchProf)
                         {
                             check = 0;
                             break;
@@ -447,25 +433,22 @@ int solve(int e, int f)
                         continue;
                     }
 
-                    /*
-                    lis[_t] = intersection(ps,t[_t].s);
-                    lis1[_t] = ps_tts[_t];
-                    if(lis[_t]!=lis1[_t])
-                    {
-                        cout<<"Sth wrong ps_tts.";exit(0);
-                    }
-                    */
                     lis[_t] = ps_tts[_t];
                     if(lis[_t] + cs <g.miniStu)
                         continue;
                     if(mt==-1)
+                    {
                         mt = _t;
+                    }
                     else if (lis[_t]>lis[mt])
+                    {
                         mt = _t;
+                    }
                 }
                 if(mt==-1)
                     return 0;
                 c[_c].t.push_back(mt);
+
                 del(pt,mt);
                 pt_sz--;
                 for(int i=1;i<=g.nStu;i++)
@@ -525,6 +508,7 @@ int solve(int e, int f)
         }
     }
 
+
     for(int _t = 1; _t <= g.nProf ; _t++)
     {
         if(selt[_t]==0)
@@ -536,7 +520,7 @@ int solve(int e, int f)
                 int check = 1;
                 for(auto j: c[_c].s)
                 {
-                    if(g.prf[_t][j]<g.minMachProf)
+                    if(g.prf[_t][j]<g.minMatchProf)
                     {
                         check = 0;
                         break;
@@ -547,7 +531,9 @@ int solve(int e, int f)
                 lis[_c] = intersection(c[_c].ps,t[_t].s);
 
                 if(mc==-1)
+                {
                     mc=_c;
+                }
                 else if(lit[_c]<lit[mc])
                 {
                     mc = _c;
@@ -557,7 +543,9 @@ int solve(int e, int f)
             {
                 return 0;
             }
+
             c[mc].t.push_back(_t);
+
             for(int _c=1;_c<=g.nC;_c++)
             {
                 c[_c].pt_sz -= del(c[_c].pt,_t);
@@ -586,7 +574,7 @@ int solve(int e, int f)
                 }
                 for(auto _t: c[_c].t)
                 {
-                    if(g.prf[_t][i]<g.minMachProf)
+                    if(g.prf[_t][i]<g.minMatchProf)
                     {
                         check = 0;
                         break;
@@ -601,9 +589,12 @@ int solve(int e, int f)
                     mc = _c;
                 }
                 else if (lis[_c]+lit[_c]<lis[mc]+lit[mc])
+                {
                     mc = _c;
+                }
             }
             if(mc==-1) return 0;
+
             c[mc].s.push_back(i);
             for(int _c=1;_c<=g.nC;_c++)
             {
@@ -616,156 +607,61 @@ int solve(int e, int f)
     return 1;
 }
 
-bool arr1[100'000'000];
-bool arr2[100'000'000];
-
-vector<int> prj_val;
-vector<int> prf_val;
-
 void input()
 {
     cin>>g.nStu>>g.nProf>>g.nC;
-    cin>>g.miniStu>>g.maxStu>>g.miniProf>>g.maxProf>>g.minMatchStu>>g.minMachProf;
+    cin>>g.miniStu>>g.maxStu>>g.miniProf>>g.maxProf>>g.minMatchStu>>g.minMatchProf;
     for(int i=1;i<=g.nStu;i++)
     {
         for(int j=1;j<=g.nStu;j++)
         {
             int gg;
             cin>>gg;
-            if (i==j)
+            if (i==j || gg<g.minMatchStu)
             {
-                g.prj[i][j] = -1;
-                continue;
+                gg = 0;
             }
             g.prj[i][j] = gg;
-            if(gg<100'000'000)
-            {
-                if(arr1[gg]==0)
-                {
-                    arr1[gg] = 1;
-                    prj_val.push_back(gg);
-                }
-            }
-            else
-            {
-                prj_val.push_back(gg);
-            }
         }
     }
-    for(int _t=1;_t<=g.nProf;_t++)
+    for (int i=1;i<=g.nStu;i++)
     {
-        for (int i=1;i<=g.nStu;i++)
+        for(int _t=1;_t<=g.nProf;_t++)
         {
             int gg = 0;
             cin>>gg;
+            if (gg<g.minMatchProf)
+                gg = 0;
             g.prf[_t][i] = gg;
-            if(gg<100'000'000)
-            {
-                if(arr2[gg]==0)
-                {
-                    arr2[gg] = 1;
-                    prf_val.push_back(gg);
-                }
-            }
-            else
-            {
-                prf_val.push_back(gg);
-            }
         }
-    }
+    }    
     for(int i=1;i<=g.nStu;i++)
     {
         int gg; cin>>gg;
         guide[gg] = 1;
-        g.prf[gg][i] = -1;
+        g.prf[gg][i] = 0;
     }
-    sort(prj_val.begin(),prj_val.end());
-    sort(prf_val.begin(),prf_val.end());
-    prj_val.resize(std::distance(prj_val.begin(),std::unique(prj_val.begin(), prj_val.end())));
-    prf_val.resize(std::distance(prf_val.begin(),std::unique(prf_val.begin(), prf_val.end())));
-    sort(prj_val.begin(),prj_val.end());
-    sort(prf_val.begin(),prf_val.end());
-    int left = 0; int right = prj_val.size()-1;
-    int mid = 0;
-    int _e = prj_val[0];
-    int _f = prf_val[0];
+
+    for(int i=1;i<=g.nStu;i++)
+    {
+        for(int j=1;j<=g.nStu;j++)
+        {
+            if (g.prj[i][j]<g.minMatchStu)
+            {
+                g.prj[i][j] = 0;
+                g.prj[j][i] = 0;
+            }
+        }
+    }
 
     clock_t BeginTime = clock();
-
-    clock_t TrueSolve = 0;
-    clock_t FalseSolve = 0;
-    int ide = 0;
-    int idf = 0;
-
-    clock_t t;
-
-    int check = 0;
-
-    while(left<=right)
-    {
-        if (check==0)
-            mid = left + (right-left)/4;
-        else
-            mid = left + (right-left)/2;
-        t = clock();
-        if (solve(prj_val[mid],_f)==1)
-        {
-            check = 0;
-            TrueSolve += clock()-t;
-            left = mid + 1;
-            _e = max(prj_val[mid],_e);
-            ide = mid;
-        }
-        else
-        {
-            check = 1;
-            FalseSolve += clock()-t;
-            right = mid - 1;
-        }
-    }
-    left = 0;right = prf_val.size()-1;
-    mid = 0;
-    check = 0;
-    while(left<=right)
-    {
-        if (check==0)
-            mid = left + (right-left)/4;
-        else
-            mid = left + (right-left)/2;
-
-        mid = left + (right-left)/4;
-        t = clock();
-        if(solve(_e,prf_val[mid])==1)
-        {
-            check = 0;
-            _f = max(prf_val[mid],_f);
-            left = mid + 1;
-            idf = mid;
-            TrueSolve += clock()-t;
-        }
-        else
-        {
-            check = 1;
-            FalseSolve += clock()-t;
-            right = mid - 1;
-        }
-    }
-
-    if(solve(_e,_f)==0)
+    if(solve(g.minMatchStu,g.minMatchProf)==0)
     {
         cout<<"No solution"<<el;
         exit(0);
     }
 
-    cout<<"Maximum value of e and f are:\n"<<_e<<" "<<_f<<"\n\n";
-
     int ans = 0;
-    /*
-    cout<<"Index of e: "<<ide<<el;
-    cout<<"Index of f: "<<idf<<el;
-    cout<<"True solve time: "<<double(TrueSolve)/double(CLOCKS_PER_SEC)<<"s.";
-    cout<<"False solve time: "<<double(FalseSolve)/double(CLOCKS_PER_SEC)<<"s.";
-    */
 
     for(int _c=1;_c<=g.nC;_c++)
     {

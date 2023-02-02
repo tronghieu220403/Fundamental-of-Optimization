@@ -1,1 +1,15 @@
-No solution
+Council 1:
+4 project:
+5 6 7 8 
+6 teacher:
+2 3 4 5 7 10 
+
+Council 2:
+6 project:
+1 2 3 4 9 10 
+4 teacher:
+1 6 8 9 
+
+
+Answer is: 510
+Solve in 0.20345354080200195s

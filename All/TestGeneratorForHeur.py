@@ -2,7 +2,7 @@ from random import *
 from Project26Ex import CP
 def r(x,y=0):
     if y>x:
-        y,x = x,y
+        x,y = y,x
     return randint(y,x)
 
 from ortools.sat.python import cp_model
@@ -13,7 +13,7 @@ BeginTime = time.time()
 
 import os
 
-finp = 0
+finp = 0#open("HeuristicAns.out","r")
 
 def read():
     global finp
@@ -21,7 +21,7 @@ def read():
         xx = finp.readline()
         if "No" in xx:
             print("No solution.")
-            exit()
+            #exit()
         if len(xx) == 1 or "C" in xx or ":" in xx:
             continue
         return list(map(int, xx.split()))
@@ -32,97 +32,14 @@ def Generate(nStu, nProf, nCouncil):
 
     Guide = [0 for _ in range(nStu)]
 
-    minStu = max(max(nStu//nCouncil*3//4,r(nStu//nCouncil- (r(max(nStu//nCouncil-2,1),1))//2,2)),1)
+    minStu = max(nStu//nCouncil*3//4,r(nStu//nCouncil- (r(max(nStu//nCouncil-2,1),1))//2,2))
     maxStu = minStu + r(max(2,nStu-nCouncil*minStu), 2)
     
-    minProf = max(max(nProf//nCouncil*3//4,r(nProf//nCouncil- (r(max(nProf//nCouncil-2,1),1)//2),2)),1)
+    minProf = max(nProf//nCouncil*3//4,r(nProf//nCouncil- (r(max(nProf//nCouncil-2,1),1)//2),2))
     maxProf = minProf + r(max(2,nProf-nCouncil*minProf),2)
-
-    nCS = [0 for _  in range(nCouncil)]
-    nCT = [0 for _  in range(nCouncil)]
-    
-    for i in range(nCouncil):
-        nCS[i] = model.NewIntVar(minStu,maxStu,f"x_{i}")
-        nCT[i] = model.NewIntVar(minProf,maxProf,f"y_{i}")
-    
-    model.Add(sum(nCS)==nStu)
-    model.Add(sum(nCT)==nProf)
-
-    BeginTime = time.time()
-
-    solver = cp_model.CpSolver()
-    solver.parameters.enumerate_all_solutions = False
-    solver.parameters.max_time_in_seconds = 10.0
-
-    status = solver.Solve(model)
-    if status in [cp_model.UNKNOWN]:
-        return 0
-
-    if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
-        return 0
-    
     table = [[0 for __ in range(nStu)] for _ in range(nStu)]
-    
-    l = []
-    ss = [[0 for _ in range(nStu)] for __ in range(nStu)]
-    st = [[0 for _ in range(nProf)] for __ in range(nStu)]
-
-    stubase = 0
-    prfbase = 0
-
-    for b in range(nCouncil):
-        for i in range(solver.Value(nCS[b])):
-            for j in range(i+1,solver.Value(nCS[b])):
-                ss[i+stubase][j+stubase] = 1
-                ss[j+stubase][i+stubase] = 1
-            for t in range(solver.Value(nCT[b])):
-                st[i+stubase][t+prfbase] = 1
-        stubase += solver.Value(nCS[b])
-        prfbase += solver.Value(nCT[b])
-
-    for i in range(nStu):
-        for j in range(i+1,nStu):
-            if (ss[i][j]) > 0:
-                table[i][j] = 1
-                table[j][i] = 1
-            elif i!=j:
-                l.append((i,j))
-
-    giveaway = nStu*nStu//4
-    sz = len(l)
-    for i in range(giveaway):
-        if sz==0:
-            break
-        index = r(sz-1)
-        table[l[index][0]][l[index][1]] = 1
-        table[l[index][1]][l[index][0]] = 1
-        l[index],l[sz-1] = l[sz-1],l[index]
-        sz = sz - 1
-        
-        
     table1 = [[0 for __ in range(nStu)] for _ in range(nProf)]
-    
-    l = []
-
-    for i in range(nStu):
-        for t in range(nProf):
-            if (st[i][t]) > 0:
-                table1[t][i] = 1
-            else:
-                Guide[i] = t
-                if j!=Guide[i]:
-                    l.append((t,i))
-
-    sz = len(l)
-    giveaway = nStu*nProf//4 * 2
-    for i in range(giveaway):
-        if sz==0:
-            break
-        index = r(sz-1)
-        table1[l[index][0]][l[index][1]] = 1
-        l[index],l[sz-1] = l[sz-1],l[index]
-        sz = sz-1
-    
+     
     fout = open("data.inp","w")
     def w(x="", end = '\n'):
         fout.write(format(x))
@@ -130,55 +47,57 @@ def Generate(nStu, nProf, nCouncil):
         return
 
     w(str(nStu) + " " + str(nProf) + " " + str(nCouncil))
-    minMatchPrj = r(1500,500)
-    minMatchPrf = r(1500,500)
+    #minMatchPrj = r(15000000,500)
+    #minMatchPrf = r(15000000,500)
+    minMatchPrf  = 1
+    minMatchPrj = 1
     w(str(minStu) + " " + str(maxStu) + " " + str(minProf) + " " + str(maxProf) + " " + str(minMatchPrj) + " " + str(minMatchPrf))
     
     for i in range(nStu):
         for j in range(nStu):
             if table[i][j] > 0:
-                w(minMatchPrj+r(minMatchPrj)+10,end = " ")
-                #w(9, end = " ")
+                #w(minMatchPrj+r(minMatchPrj)+10,end = " ")
+                w(r(9,1), end = " ")
             else:
-                w(minMatchPrj-r(minMatchPrj)//2+10, end = " ")
-                #w(0, end = " ")
+                #w(minMatchPrj-r(minMatchPrj)//2+10, end = " ")
+                w(r(9,1), end = " ")
         w()
     w()
-    for t in range(nProf):
-        for i in range(nStu):
+    for i in range(nStu):
+        for t in range(nProf):
             if table1[t][i] == 0:
-                w(minMatchPrf-r(minMatchPrf//2)+10,end = " ")
-                #w(0,end=" ")
+                #w(minMatchPrf-r(minMatchPrf//2)+10,end = " ")
+                w(r(9,1),end=" ")
             else:
-                w(minMatchPrf+r(minMatchPrf)+10,end = " ")
-                #w(9,end=" ")
+                #w(minMatchPrf+r(minMatchPrf)+10,end = " ")
+                w(r(9,1),end=" ")
         w()
-    w()
+    dem = 0
+    index = 0
+    Guide = [i%nProf for i in range(nStu)]
+    shuffle(Guide)
+
     for i in range(nStu):
         w(Guide[i]+1,end = " ")
     w()
     fout.close()
 
-    print("Generated.",flush=True)
-
     return 1
 
-def check(fileOut = "HeuristicAns.out",fileIn = "data.inp"):
-    print("Checking your answer...")
+def check(fileOut,fileIn = "data.inp"):
     global finp 
     finp = open(fileOut,"r")
+    if ("o s" in finp.readline()):
+        return -1
     x = CP(fileIn)
     StuData, PrfData = x.ReadInput()
-    l = read()
-    if l == -1:
-        return 1
-    #print(l)
-    e, f = l[0],l[1]
+    e, f = x.GetValue("minMatchStu"),x.GetValue("minMachProf")
     nCouncil = x.GetValue("nCouncil")
     nStu = x.GetValue("nStu")
     nProf = x.GetValue("nProf")
     StuData1 = [0 for _ in range(nCouncil)]
-    PrfData1 = [0 for _ in range(nCouncil)] 
+    PrfData1 = [0 for _ in range(nCouncil)]
+    ans = 0
     for b in range(nCouncil):
         Stu = read()
         Prf = read()
@@ -187,12 +106,14 @@ def check(fileOut = "HeuristicAns.out",fileIn = "data.inp"):
         for i in Stu:
             for j in Stu:
                 if i!=j:
+                    ans += StuData[i-1][j-1]
                     if StuData[i-1][j-1] < e:
                         raise ValueError(f'Wrong in StuData: {i} {j}: {StuData[i-1][j-1]} < {e}')
             for t in Prf:
+                ans+= PrfData[i-1][j-1]
                 if PrfData[t-1][i-1] < f:
                     raise ValueError(f'Wrong in PrfData: {t} {i}: {PrfData[t-1][i-1]} < {f}')
-    finp.close()
+    #finp.close()
     for i in range(nCouncil):
         for j in range(i+1,nCouncil):
             if len(set(StuData1[i]).intersection(set(StuData1[j]))) != 0:
@@ -205,27 +126,61 @@ def check(fileOut = "HeuristicAns.out",fileIn = "data.inp"):
     if sum(len(PrfData1[i]) for i in range(nCouncil))!=nProf:
         raise ValueError(f'Not enough teacher: {sum(len(PrfData1[i]) for i in range(nCouncil))} {nProf}')
 
-    print("No error found.")
-    return
+    #print("No error found.")
+    return ans
 
-def CheckOnly(_N,_M,x=0,fileOut = "HeuristicAns.out",fileIn = "data.inp"):
+def get_ans(fileOut,fileIn = "data.inp"):
+    finp1 = open(fileOut,"r")
+    while(True):
+        xx = finp1.readline()
+        if ("o s" in xx):
+            return -1
+        if "wer" in xx:
+            return int(xx[len("Answer is: "):-1])
+
+def CheckOnly(_N,_M,x=0,fileOut = "",fileIn = "data.inp"):
+    ans3 = 0
     if x==1:
         BeginTime = time.time()
-        if _N*(_N+_M) <= 5000:
-            os.system("python HeuristicSolverForSmallData.py")
-        else:
-            os.system("Heuristic.exe")
-        print(f"Solve in {time.time()-BeginTime}s.")
-    check(fileOut,fileIn)
+        os.system("Heuristic.exe")  #write answer to HeuristicAns.out
+        os.system("Heuristic1.exe")          #write answer to HeuristicAns1.out
+        os.system("Heuristic3.exe")          #write answer to HeuristicAns3.out
+        #print(f"Solve in {time.time()-BeginTime}s.")
+        if _N*(_N+_M) <= 150*300:
+            os.popen("python HeuristicSolverForSmallData.py").read()   #write answer to HeuristicAns2.out
+            ans3 = get_ans("HeuristicAns2.out")
+    #ans1 = check(fileOut,fileIn)
+    #ans2 = check("HeuristicAns1.out",fileIn)
+    ans1 = get_ans("HeuristicAns.out")
+    ans2 = get_ans("HeuristicAns1.out")
+    ans4 = get_ans("HeuristicAns3.out")
+    if ans1 == -1:
+        print("Heuristic.exe provide no solution")
+    if ans2 == -1:
+        print("Heuristic1.exe provide no solution")
+    if ans3 == -1:
+        print("HeuristicSolverForSmallData.py provide no solution")
+    if ans4 == -1:
+        print("Heuristic3.exe provide no solution")
+    if ans2 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns1.out")
+    elif ans1 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns.out")
+    elif ans3 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns2.out")
+    elif ans4 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns3.out")
+
 
 #Generate input to data.inp and check the result.
-#GenerateAndCheck(30,500,500) #n and m are number of students and number of teachers
 Test = 1
 for _ in range(Test):
     print("Test case "+str(_))
-    _N = 40
-    _M = 75
-    while(True):
-        if Generate(_N,_M,r(7,9))==1:
+    _N = 1000
+    _M = 200
+    _K = r(50,70)
+    T = 1
+    while(T):
+        if Generate(_N,_M,_K)==1:
             break
     CheckOnly(_N,_M,1) #if you already have an input file "data.inp", you can check your code with that test case by using this.

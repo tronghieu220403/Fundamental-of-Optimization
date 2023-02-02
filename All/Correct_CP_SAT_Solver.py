@@ -23,10 +23,12 @@ def r():
 for i in range(nStu):
     PrjData[i] = r()
 
-PrfData = [[] for i in range(nProf) ]
+PrfData = [[0 for __ in range(nStu)] for _ in range(nProf) ]
 
-for i in range(nProf):
-    PrfData[i] = r()
+for i in range(nStu):
+    xx = r()
+    for _t in range(len(xx)):
+        PrfData[_t][i] = xx[_t]
 
 Guide = r()
 for i in range(len(Guide)):
@@ -39,17 +41,12 @@ for i in range(nStu):
 
 BeginTime = time.time()
 
-print("LET'S START",flush=True)
-
 table = [[[] for __ in range(2)] for _ in range(nCouncil)]
 
 ans = 0
 
-def solve(e, f, getMax = 0):
-    
-    minMatchStu = e
-    minMachProf = f
-    
+def solve(getMax = 0):
+        
     model = cp_model.CpModel()
 
     #set up cs: council + student
@@ -113,72 +110,43 @@ def solve(e, f, getMax = 0):
         return
     link_cs_ct()
 
+    ss = [[0 for _ in range(nStu)] for __ in range(nStu)]
+    for i in range(nStu):
+        for j in range(nStu):
+            ss[i][j] = model.NewBoolVar(f'ss_{i}_{j}')
+            model.AddMaxEquality(ss[i][j], [cs[b][i] + cs[b][j]-1 for b in range(nCouncil)])
+
+    #set up ct: council + teacher
+    st = [[0 for _ in range(nProf)] for __ in range(nStu)]
+    for i in range(nStu):
+        for t in range(nProf):
+            st[i][t] = model.NewBoolVar(f'st_{i}_{t}')
+            model.AddMaxEquality(st[i][t],[cs[b][i]+ct[b][t]-1 for b in range(nCouncil)])
+
+    #maxmatch = sum(PrjData[i][j] for j in range(nStu) for i in range(nStu)) + sum(PrfData[t][i] for i in range(nStu) for t in range(nProf)
+    #minAns = model.NewIntVar(0, , 'min_time')
+    model.Maximize(sum(ss[i][j]*PrjData[i][j] for j in range(nStu) for i in range(nStu)) + sum(st[i][t]*PrfData[t][i] for i in range(nStu) for t in range(nProf)))
+
     solver = cp_model.CpSolver()
     
-    if getMax == 1:
-        class SolutionPrinter(cp_model.CpSolverSolutionCallback):
-            """Print intermediate solutions."""
-
-            def __init__(self):
-                cp_model.CpSolverSolutionCallback.__init__(self)
-
-            # calculate solution here
-            def on_solution_callback(self):
-                _cs = [[0 for _ in range(nStu)] for __ in range(nCouncil)]
-                _ct = [[0 for _ in range(nProf)] for __ in range(nCouncil)]
-                _table = [[[] for __ in range(2)] for _ in range(nCouncil)]
-                _ans = 0
-                for b in range(nCouncil):
-                    for i in range(nStu):
-                        if self.BooleanValue(cs[b][i]) > 0:
-                            _table[b][0].append(i)
-                    for t in range(nProf):
-                        if self.BooleanValue(ct[b][t]) > 0:
-                            _table[b][1].append(t)
-                
-                for b in range(nCouncil):
-                    for i in _table[b][0]:
-                        for j in _table[b][0]:
-                            if i!=j:
-                                _ans += PrjData[i][j]    
-                        for t in _table[b][1]:
-                            _ans += PrfData[t][i]
-
-                global table
-                global ans
-                if (ans<_ans):
-                    table = _table
-                    ans = _ans
-        
-                return
-
-        solver.parameters.enumerate_all_solutions = True
-        solver.parameters.max_time_in_seconds = 60.0
-        callback = SolutionPrinter()
-        status = solver.Solve(model,callback)
-        if status not in [cp_model.OPTIMAL]:
-            return 0
-    else:
-        solver.parameters.enumerate_all_solutions = False
-        status = solver.Solve(model)
-        if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
-            return 0
-
+    status = solver.Solve(model)
+    
+    if status not in [cp_model.OPTIMAL]:
+        return 0
+    
+    for b in range(nCouncil):
+        for i in range(nStu):
+            if solver.BooleanValue(cs[b][i]) > 0:
+                table[b][0].append(i)
+        for t in range(nProf):
+            if solver.BooleanValue(ct[b][t]) > 0:
+                table[b][1].append(t)
+    
     return 1
 
+solve()
 
-eMax = 0
-fMax = 0
-
-eleft = 0
-fleft = 0
-
-eArr = list(sorted(list(set(list(chain.from_iterable(PrjData))))))
-fArr = list(sorted(list(set(list(chain.from_iterable(PrfData))))))
-
-fright = len(fArr)-1
-eright = len(eArr)-1
-mid = 0
+EndTime = time.time()
 
 fileOut = "CorrectAns.out"
 fout = open(fileOut,"w")
@@ -186,47 +154,8 @@ def w(x="",end='\n'):
     fout.write(format(x))
     fout.write(end)
 
-emax = -1
-
-RunTime = 0
-
-while(eleft<=eright):
-    mid = (eleft+eright)//2
-    if solve(eArr[mid],fArr[0])==1:
-        emax = max(emax,mid)
-        eleft = mid + 1
-    else:
-        eright = mid - 1
-
-if emax == -1:
-    w("No solution")
-    exit()
-
-fmax = -1
-
-while(fleft<=fright):
-    mid = (fleft+fright)//2
-    if solve(eArr[emax], fArr[mid])==1:
-        fmax = max(fmax,mid)
-        fleft = mid + 1
-    else:
-        fright = mid - 1
-
-if fmax == -1:
-    w("No solution")
-    exit()
-
-if (solve(eArr[emax],fArr[fmax],1) == 0):
-    w("No solution")
-    exit()
-    
-EndTime = time.time()
-
-
-w(f"Maximum value of e and f are:\n{eArr[emax]} {fArr[fmax]}\n")
-print(f"Maximum value of and f are {eArr[emax]} and {fArr[fmax]}")
-
 ans = 0
+
 
 for b in range(nCouncil):
     w(f"Council {b+1}:")

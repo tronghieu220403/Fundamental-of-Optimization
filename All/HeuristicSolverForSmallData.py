@@ -23,23 +23,23 @@ def r():
 for i in range(nStu): 
     PrjData[i] = r()
 
-PrfData = [[] for i in range(nProf) ]
+PrfData = [[0 for __ in range(nStu)] for _ in range(nProf) ]
 
-for i in range(nProf):
-    PrfData[i] = r()
+for i in range(nStu):
+    xx = r()
+    for _t in range(len(xx)):
+        PrfData[_t][i] = xx[_t]
 
 Guide = r()
 for i in range(len(Guide)):
     Guide[i] -= 1
-
-BeginTime = time.time()
+    PrfData[Guide[i]][i] = 0
 
 for i in range(nStu):
     PrjData[i][i]= 0
 
 BeginTime = time.time()
 
-print("LET'S START",flush=True)
 
 table = [[[] for __ in range(2)] for _ in range(nCouncil)]
 
@@ -114,9 +114,12 @@ def solve(e, f, getMax = 0):
     link_cs_ct()
 
     solver = cp_model.CpSolver()
-    
+    solver.parameters.max_time_in_seconds = 10
     solver.parameters.enumerate_all_solutions = False
     status = solver.Solve(model)
+
+    if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
+        return 0
 
     if getMax == 1:
         global table
@@ -137,67 +140,16 @@ def solve(e, f, getMax = 0):
                 for t in table[b][1]:
                     ans += PrfData[t][i]
 
-    
-    if status not in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
-        return 0
     return 1
     
 
-eMax = 0
-fMax = 0
+solve(minMatchStu, minMachProf,1)
 
-eleft = 0
-fleft = 0
-
-eArr = list(sorted(list(set(list(chain.from_iterable(PrjData))))))
-fArr = list(sorted(list(set(list(chain.from_iterable(PrfData))))))
-
-fileOut = "HeuristicAns.out"
+fileOut = "HeuristicAns2.out"
 fout = open(fileOut,"w")
 def w(x="",end='\n'):
     fout.write(format(x))
     fout.write(end)
-
-
-fright = len(fArr)-1
-eright = len(eArr)-1
-mid = 0
-
-emax = -1
-
-RunTime = 0
-
-while(eleft<=eright):
-    mid = (eleft+eright)//2
-    if solve(eArr[mid],fArr[0])==1:
-        emax = max(emax,mid)
-        eleft = mid + 1
-    else:
-        eright = mid - 1
-
-if emax == -1:
-    w("No solution")
-    exit()
-
-fmax = -1
-
-while(fleft<=fright):
-    mid = (fleft+fright)//2
-    if solve(eArr[emax], fArr[mid])==1:
-        fmax = max(fmax,mid)
-        fleft = mid + 1
-    else:
-        fright = mid - 1
-
-if fmax == -1:
-    w("No solution")
-    exit()
-
-solve(eArr[emax],fArr[fmax],1)
-
-
-w(f"Maximum value of e and f are:\n{eArr[emax]} {fArr[fmax]}\n")
-print(f"Maximum value of and f are {eArr[emax]} and {fArr[fmax]}")
 
 ans = 0
 

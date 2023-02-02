@@ -141,7 +141,7 @@ class CP():
 
         return
 
-    def Solve(self, RunTime = 0.5):        
+    def Solve(self, RunTime = 10.0):        
         self.solver = cp_model.CpSolver()
         #self.solver.parameters.num_search_workers = 8
         self.solver.parameters.enumerate_all_solutions = False
@@ -221,16 +221,16 @@ class CP():
             fout.write(format(x))
             fout.write(end)
 
-        w(f'Maximum value of e and f are:')
+        w(f'e and f are:')
         w(f'{self.minMatchStu} {self.minMachProf}')
 
         for b in range(self.nCouncil):
-            w("Council "+ str(b+1)+":")
-            w(f"{len(table[b][0])} project:")
+            w("Council "+ str(b+1))
+            w("Project: ")
             for i in table[b][0]:
                 w(str(i),end = " ")
             w()
-            w(f"{len(table[b][1])} teacher:")
+            w("Teacher: ")
             for t in table[b][1]:
                 w(str(t),end = " ")
             w()
@@ -252,3 +252,66 @@ class CP():
         except:
             raise ValueError("Not thing named " + x)
         
+        
+class Greedy():
+        
+    def __init__(self, fileIN, fileOUT = None):
+        self.fileIN = fileIN
+        self.nStu = None
+        self.nPrf = None
+        self.nCouncil = None
+        self.minStu = None
+        self.maxStu = None
+        self.minProf = None
+        self.maxProf = None
+        self.minMatchStu = None
+        self.minMachProf = None
+        self.PrjData = None
+        self.PrfData = None
+        self.fileOUT = fileOUT
+        self.Guide = None
+        self.finp = None
+        self.BeginTime = None
+        self.EndTime = None
+        self.status = ""
+        self.ans = 0
+        pass
+        
+    def ReadInput(self):
+        if type(self.fileIN) is not str or self.fileIN == "":
+            raise NameError("NOT A VALID INPUT FILE.")
+        
+        try:
+            self.finp = open(self.fileIN,"r")
+        except:
+            raise NameError("NOT A VALID INPUT FILE.")
+
+        def r():
+            while True:
+                xx = self.finp.readline()
+                if len(xx) == 1:
+                    continue
+                return list(map(int, xx.split()))
+
+        self.nStu, self.nProf, self.nCouncil = map(int, self.finp.readline().split())
+        self.miniStu, self.maxStu, self.miniProf, self.maxProf, self.minMatchStu, self.minMachProf = map(int, self.finp.readline().split())
+
+        self.PrjData = [[] for i in range(self.nStu) ]
+
+        for i in range(self.nStu):
+            self.PrjData[i] = r()
+
+        self.PrfData = [[] for i in range(self.nProf) ]
+
+        for i in range(self.nProf):
+            self.PrfData[i] = r()
+
+        self.Guide = r()
+        for i in range(len(self.Guide)):
+            self.Guide[i] -= 1
+
+        for i in range(self.nStu):
+            self.PrjData[i][i]= 0
+        self.finp.close()
+        return self.PrjData, self.PrfData
+

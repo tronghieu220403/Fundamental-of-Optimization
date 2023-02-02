@@ -214,15 +214,41 @@ def check(fileOut,fileIn = "data.inp"):
             return [e, f, ans, xx[len("Solve in "):-1]]  
     
 
-def CheckOnlyHeu(_N,_M,x=0,fileOut = "HeuristicAns.out",fileIn = "data.inp"):
+def get_ans(fileOut,fileIn = "data.inp"):
+    finp1 = open(fileOut,"r")
+    while(True):
+        xx = finp1.readline()
+        if ("o s" in xx):
+            return -1
+        if "wer" in xx:
+            return int(xx[len("Answer is: "):-1])
+
+def CheckOnlyHeu(_N,_M,x=0,fileOut = "",fileIn = "data.inp"):
+    ans3 = 0
     if x==1:
         BeginTime = time.time()
-        if _N*(_N+_M) <= 5000:
-            os.popen("python HeuristicSolverForSmallData.py").read()
-        else:
-            os.popen("Heuristic.exe").read()
+        os.system("Heuristic.exe")           #write answer to HeuristicAns.out
+        os.system("Heuristic1.exe")          #write answer to HeuristicAns1.out
+        os.system("Heuristic3.exe")          #write answer to HeuristicAns3.out
         #print(f"Solve in {time.time()-BeginTime}s.")
-    return check(fileOut,fileIn)
+        if _N*(_N+_M) <= 150*300:
+            os.popen("python HeuristicSolverForSmallData.py").read()   #write answer to HeuristicAns2.out
+            ans3 = check("HeuristicAns2.out")
+    #ans1 = check(fileOut,fileIn)
+    #ans2 = check("HeuristicAns1.out",fileIn)
+    ans1 = check("HeuristicAns.out")
+    ans2 = check("HeuristicAns1.out")
+    ans4 = check("HeuristicAns3.out")
+    '''
+    if ans2 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns1.out")
+    elif ans1 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns.out")
+    elif ans3 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns2.out")
+    elif ans4 == max([ans1,ans2,ans3,ans4]):
+        print("Answer in HeuristicAns3.out")
+    '''
 
 def CheckOnlyCP(x=0,fileOut = "CorrectAns.out",fileIn = "data.inp"):
     if x==1:
