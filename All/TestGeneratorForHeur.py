@@ -179,7 +179,7 @@ for _ in range(Test):
     _N = 1000
     _M = 200
     _K = r(50,70)
-    T = 1
+    T = 0
     while(T):
         if Generate(_N,_M,_K)==1:
             break
