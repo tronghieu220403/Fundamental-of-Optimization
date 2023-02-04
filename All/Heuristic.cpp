@@ -16,20 +16,14 @@ const int MaxN = 1e6+1e5;
 
 const ll mod = 1e9+7;
 
-int debug;
-
-int guide[10000];
-
-struct dou_ll
+struct Node
 {
     int prev;
     int next;
 };
 
-int del(vector<dou_ll> &a, int id)
+int del(vector<Node> &a, int id)
 {
-    //if(a[id].prev==0&&a[id].next==1004)
-        //return 0;
     if(a[id].prev==0&&a[id].next<=id)
         return 0;
     a[a[id].prev].next = a[id].next;
@@ -39,7 +33,7 @@ int del(vector<dou_ll> &a, int id)
     return 1;
 }
 
-int ins(vector<dou_ll> &target, vector<int> &source)
+int ins(vector<Node> &target, vector<int> &source)
 {
     int sz = source.size();
     if(sz==0)
@@ -63,8 +57,8 @@ int ins(vector<dou_ll> &target, vector<int> &source)
 struct Council
 {
     vector<int> t,s;
-    vector<dou_ll> ps;
-    vector<dou_ll> pt;
+    vector<Node> ps;
+    vector<Node> pt;
     int ps_sz;
     int pt_sz;
 };
@@ -81,20 +75,19 @@ struct info
 
 info g;
 
-struct linked
+//double linked list
+
+struct dll
 {
-    vector<dou_ll> s;
-    vector<dou_ll> t;
+    vector<Node> s;
+    vector<Node> t;
     int ssz,tsz;
 };
 
-linked t[1104],s[1104];
+dll t[1104],s[1104];
 
-clock_t TotalTime = 0;
-
-int intersection(vector<dou_ll> &p,vector<dou_ll> &pa)
+int intersection(vector<Node> &p,vector<Node> &pa)
 {
-    clock_t t0 = clock();
     int ans = 0;
     int now1 = 0;
     while(p[now1].next!=1004&&p[now1].next!=0)
@@ -104,11 +97,11 @@ int intersection(vector<dou_ll> &p,vector<dou_ll> &pa)
             ans++;
         now1 = p[now1].next;
     }
-    TotalTime += clock()-t0;
     return ans;
 }
 
-vector<dou_ll> pt,ps,pta,psa;
+vector<Node> pt;
+vector<Node> ps;
 
 int ps_sis[1100];
 int pt_sit[1100];
@@ -119,71 +112,82 @@ int solve(int e, int f)
     g.minMatchStu = e;
     g.minMatchProf = f;
 
-    //cout<<endl<<"e and f is: ";
-    //cout<<e<<" "<<f<<el<<flush;
-
+    // set up data
     for(int i=1;i<=g.nStu;i++)
     {
         s[i].t.clear();
         s[i].t.resize(1100);
         s[i].s.clear();
         s[i].s.resize(1100);
-        memset(&s[i].s[0],0,1100*sizeof(dou_ll));
-        memset(&s[i].t[0],0,1100*sizeof(dou_ll));
+        memset(&s[i].s[0],0,1100*sizeof(Node));
+        memset(&s[i].t[0],0,1100*sizeof(Node));
     }
     for(int _t=1;_t<=g.nProf;_t++)
     {
         t[_t].s.clear();
         t[_t].s.resize(1100);
-        memset(&t[_t].s[0],0,1100*sizeof(dou_ll));
+        memset(&t[_t].s[0],0,1100*sizeof(Node));
     }
+    //end set up data
 
-    vector<int> trash,trash1;
+    /*
+    Setting up double linked list for s[i].s, s[i].t, t[_t].s
+    */
+    vector<int> StudentList, TeacherList;
     for(int i=1;i<=g.nStu;i++)
     {
         for(int j=1;j<=g.nStu;j++)
         {
+            // if student i and student j have a possibility to be in a same group
             if (g.prj[i][j]>=g.minMatchStu && g.prj[j][i]>=g.minMatchStu)
             {
-                //s[i].s.insert(j);
-                trash.push_back(j);
+                StudentList.push_back(j);
             }
         }
-        s[i].ssz = ins(s[i].s,trash);
+        // s[i].s: List of student that can be in same council with student i
+        s[i].ssz = ins(s[i].s,StudentList);
         for (int _t=1;_t<=g.nProf;_t++)
         {
+            // if student i and teacher t have a possibility to be in a same group
             if (g.prf[_t][i]>=g.minMatchProf)
             {
-                //s[i].t.insert(_t);
-                trash1.push_back(_t);
+                TeacherList.push_back(_t);
             }
         }
-        s[i].tsz = ins(s[i].t,trash1);
-        trash1.clear();
-        trash.clear();
+        //s[i].t: List of teacher that can be in same council with student i
+        s[i].tsz = ins(s[i].t,TeacherList);
+        StudentList.clear();
+        TeacherList.clear();
     }
-    //cout<<"OKE"<<flush;
+
     for (int _t=1;_t<=g.nProf;_t++)
     {
         for (int i=1;i<=g.nStu;i++)
         {
+            // if student i and teacher t have a possibility to be in a same group
             if (g.prf[_t][i]>=g.minMatchProf)
             {
-                //t[_t].s.insert(i);
-                trash.push_back(i);
+                StudentList.push_back(i);
             }
         }
-        t[_t].ssz = ins(t[_t].s,trash);
-        trash.clear();
+        //t[_t].s: List of student that can be in same council with teacher _t
+        t[_t].ssz = ins(t[_t].s,StudentList);
+        StudentList.clear();
     }
-    pt.clear();ps.clear();psa.clear();pta.clear();
+
+    //set up data
+    pt.clear();ps.clear();
     int lit[1100],lis[1100];
     int lit1[1100],lis1[1100];
 
-    int sels[1100],selt[1100];
-    fill(sels,sels+1050,0);
-    fill(selt,selt+1050,0);
-    int ps_sz, pt_sz;
+    int StudentSelected[1100],TeacherSelected[1100];
+    // StudentSelected[i] = 1 means that student i (project i) was selected
+    // TeacherSelected[_t] = 1 means that teacher _t was selected
+    fill(StudentSelected,StudentSelected+1050,0);
+    fill(TeacherSelected,TeacherSelected+1050,0);
+    int ps_sz; //potential student size
+    int pt_sz; //potential teacher size
+    
     for(int _c=1;_c<=g.nC;_c++)
     {
         c[_c].ps.clear();
@@ -195,47 +199,58 @@ int solve(int e, int f)
         c[_c].ps.resize(1100);
         c[_c].pt.resize(1100);
     }
+    //end set up data
 
     for(int _c=1;_c<=g.nC;_c++)
     {
-        pt.clear();
-        ps.clear();
-        int mt1 = -1;
+        // Now we are going to find first pair of student - teacher
+
+        int mt = -1;    // mt (short for max teacher): teacher that have the most student that can be in the same council
+        // Among all teacher, choose 
         for(int _t=1;_t<=g.nProf;_t++)
         {
-            if(selt[_t]==(ll)(1)) continue;
-            if(guide[_t]==1)
-            {
-                mt1 = _t;
-                break;
-            }
+            // if Teacher _t has been selected, ignore
+            if(TeacherSelected[_t]==(ll)(1)) continue;
+
+            /*
+            Go through all teacher _t that satisfy:
+            the number of student that teacher _t can NOW connect greater or equal
+            than the minimun of number of students in a council.
+            We choose teacher with highest potentail connection
+            (purpose: highest potential connection can bring more member to that council)
+            */
             if (t[_t].ssz>= g.miniStu)
             {
-                if(mt1==-1)
-                    mt1 = _t;
-                else if(t[_t].ssz>t[mt1].ssz)
+                if(mt==-1) // if no teacher was choosed -> choose that teacher
+                    mt = _t;
+                else if(t[_t].ssz>t[mt].ssz) // if higher potential connection -> update
                 {
-                    mt1 = _t;
+                    mt = _t;
                 }
             }
         }
-        if (mt1 == -1)
+        if (mt == -1)
         {
             return 0;
         }
-        selt[mt1] = 1;
-        c[_c].t.push_back(mt1);
+        if (mt == -1) // if can not choose any teacher -> no solution
+        {
+            return 0;
+        }
+
+        TeacherSelected[mt] = 1; // mark that teacher mt was selected
+        c[_c].t.push_back(mt); // add that teacher to council _c
 
         vector<int> trash;
         int now = 0;
-        while(t[mt1].s[now].next!=1004&&t[mt1].s[now].next!=0)
+        while(t[mt].s[now].next!=1004&&t[mt].s[now].next!=0)
         {
-            now = t[mt1].s[now].next;
-            if(sels[now]==0)
+            now = t[mt].s[now].next;
+            if(StudentSelected[now]==0)
                 trash.push_back(now);
         }
         ps.resize(1100);
-        memset(&ps[0],0,1100*sizeof(dou_ll));
+        memset(&ps[0],0,1100*sizeof(Node));
         ps_sz = ins(ps,trash);
         trash.clear();
         int ms = -1;
@@ -244,7 +259,7 @@ int solve(int e, int f)
         {
             int _s = ps[now].next;
             now = ps[now].next;
-            if(sels[_s]==1) continue;
+            if(StudentSelected[_s]==1) continue;
             if(s[_s].tsz>=g.miniProf&&s[_s].ssz>=g.miniStu-1)
             {
                 if(ms==-1)
@@ -261,7 +276,7 @@ int solve(int e, int f)
         {
             return 0;
         }
-        sels[ms] = 1;
+        StudentSelected[ms] = 1;
         c[_c].s.push_back(ms);
 
         trash.clear();
@@ -269,28 +284,30 @@ int solve(int e, int f)
         while(s[ms].t[now].next!=1004&&s[ms].t[now].next!=0)
         {
             now = s[ms].t[now].next;
-            if(selt[now]==0)
+            if(TeacherSelected[now]==0)
                 trash.push_back(now);
         }
+        
+        pt.clear(); // 
+        ps.clear(); //  
         pt.resize(1100);
-        memset(&pt[0],0,1100*sizeof(dou_ll));
+        memset(&pt[0],0,1100*sizeof(Node));
         pt_sz = ins(pt,trash);
         trash.clear();
         del(ps,ms);
         ps_sz--;
-        del(pt,mt1);
+        del(pt,mt);
         pt_sz--;
         for(int i=1;i<=g.nStu;i++)
         {
             s[i].ssz-=del(s[i].s,ms);
-            s[i].tsz-=del(s[i].t,mt1);
+            s[i].tsz-=del(s[i].t,mt);
         }
         for(int _t=1;_t<=g.nProf;_t++)
         {
             t[_t].ssz-=del(t[_t].s,ms);
         }
 
-        //ps and pt are defined
         for(int i=1;i<=g.nStu;i++)
         {
             if(ps_sz<s[i].ssz)
@@ -332,7 +349,7 @@ int solve(int e, int f)
                     int i = ps[now].next;
                     now = ps[now].next;
                     if(checks[i]==1) continue;
-                    if(sels[i]==1) continue;
+                    if(StudentSelected[i]==1) continue;
 
                     int check = 1;
                     for(auto _t: c[_c].t)
@@ -399,7 +416,7 @@ int solve(int e, int f)
                 ps_sz--;
                 s[ms].s.clear();
                 s[ms].t.clear();
-                sels[ms] = 1;
+                StudentSelected[ms] = 1;
 
             }
             int mt = -1;
@@ -416,7 +433,7 @@ int solve(int e, int f)
                     int _t = pt[now].next;
                     now = pt[now].next;
                     if(checkt[_t]==1) continue;
-                    if(selt[_t]==1) continue;
+                    if(TeacherSelected[_t]==1) continue;
 
                     int check = 1;
                     for (auto i: c[_c].s)
@@ -461,7 +478,7 @@ int solve(int e, int f)
                     }
                 }
                 t[mt].s.clear();
-                selt[mt] = 1;
+                TeacherSelected[mt] = 1;
             }
             //cout<<"choose teacher and student: "<<mt<<" "<<ms<<el<<flush;
             if (action==2)
@@ -488,7 +505,7 @@ int solve(int e, int f)
 
     for(int i=1;i<=g.nStu;i++)
     {
-        if(sels[i]==1)
+        if(StudentSelected[i]==1)
         {
             for(int _c=1;_c<=g.nC;_c++)
             {
@@ -499,7 +516,7 @@ int solve(int e, int f)
 
     for(int _t = 1; _t <= g.nProf ; _t++)
     {
-        if(selt[_t]==1)
+        if(TeacherSelected[_t]==1)
         {
             for(int _c=1;_c<=g.nC;_c++)
             {
@@ -511,7 +528,7 @@ int solve(int e, int f)
 
     for(int _t = 1; _t <= g.nProf ; _t++)
     {
-        if(selt[_t]==0)
+        if(TeacherSelected[_t]==0)
         {
             int mc = -1;
             for(int _c=1;_c<=g.nC;_c++)
@@ -550,13 +567,13 @@ int solve(int e, int f)
             {
                 c[_c].pt_sz -= del(c[_c].pt,_t);
             }
-            selt[_t] = 1;
+            TeacherSelected[_t] = 1;
         }
     }
 
     for(int i=1;i<=g.nStu;i++)
     {
-        if(sels[i]==0)
+        if(StudentSelected[i]==0)
         {
             int mc = -1;
             for(int _c=1;_c<=g.nC;_c++)
@@ -600,7 +617,7 @@ int solve(int e, int f)
             {
                 c[_c].ps_sz -= del(c[_c].ps,i);
             }
-            sels[i] = 1;
+            StudentSelected[i] = 1;
         }
     }
 
@@ -638,7 +655,6 @@ void input()
     for(int i=1;i<=g.nStu;i++)
     {
         int gg; cin>>gg;
-        guide[gg] = 1;
         g.prf[gg][i] = 0;
     }
 

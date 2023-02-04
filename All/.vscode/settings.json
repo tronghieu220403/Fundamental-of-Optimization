@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "vector": "cpp",
+        "bitset": "cpp",
+        "set": "cpp",
+        "atomic": "cpp",
+        "deque": "cpp",
+        "filesystem": "cpp",
+        "forward_list": "cpp",
+        "ios": "cpp",
+        "list": "cpp",
+        "system_error": "cpp",
+        "xhash": "cpp",
+        "xiosbase": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

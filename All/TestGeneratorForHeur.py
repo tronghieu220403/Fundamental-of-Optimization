@@ -177,10 +177,10 @@ Test = 1
 for _ in range(Test):
     print("Test case "+str(_))
     _N = 1000
-    _M = 200
+    _M = 1000
     _K = r(50,70)
     T = 0
     while(T):
         if Generate(_N,_M,_K)==1:
             break
-    CheckOnly(_N,_M,1) #if you already have an input file "data.inp", you can check your code with that test case by using this.
+    #CheckOnly(_N,_M,1) #if you already have an input file "data.inp", you can check your code with that test case by using this.
