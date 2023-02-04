@@ -18,8 +18,6 @@ const ll mod = 1e9+7;
 
 int debug;
 
-int guide[10000];
-
 struct dou_ll
 {
     int prev;
@@ -222,11 +220,6 @@ int solve(int e, int f)
         for(int _t=1;_t<=g.nProf;_t++)
         {
             if(selt[_t]==(ll)(1)) continue;
-            if(guide[_t]==1)
-            {
-                mt1 = _t;
-                break;
-            }
             if (t[_t].ssz>= g.miniStu)
             {
                 if(mt1==-1)
@@ -792,7 +785,6 @@ void input()
     for(int i=1;i<=g.nStu;i++)
     {
         int gg; cin>>gg;
-        guide[gg] = 1;
         g.prf[gg][i] = 0;
     }
 
@@ -816,6 +808,42 @@ void input()
 
     int ans = 0;
 
+    int TeacherAns[1100], StudentAns[1100];
+
+    for(int _c=1;_c<=g.nC;_c++)
+    {
+        for(auto i: c[_c].s)
+        {
+            StudentAns[i] = _c;
+            for(auto j: c[_c].s)
+            {
+                if(i!=j)
+                    ans += g.prj[i][j];
+            }
+        }
+        for(auto _t: c[_c].t)
+        {
+            TeacherAns[_t] = _c;
+            for(auto i: c[_c].s)
+            {
+                ans += g.prf[_t][i];
+            }
+        }
+    }
+
+    cout<<g.nStu<<el;
+    for (int i=1;i<=g.nStu;i++)
+    {
+        cout<<StudentAns[i]<<" ";
+    }
+    cout<<el<<g.nProf<<el;
+    for (int _t=1;_t<=g.nProf;_t++)
+    {
+        cout<<TeacherAns[_t]<<" ";
+    }
+
+    cout<<el<<el<<"Answer is: "<<ans<<el;
+    cout<<"Solve in "<<double(clock()-BeginTime)/double(CLOCKS_PER_SEC)<<"s."<<el<<el;
     for(int _c=1;_c<=g.nC;_c++)
     {
         cout<<"Council "<<_c<<":"<<el;
@@ -823,26 +851,15 @@ void input()
         for(auto i: c[_c].s)
         {
             cout<<i<<" ";
-            for(auto j: c[_c].s)
-            {
-                if(i!=j)
-                    ans += g.prj[i][j];
-            }
         }
         cout<<el;
         cout<<c[_c].t.size()<<" teacher: "<<el;
         for(auto _t: c[_c].t)
         {
             cout<<_t<<" ";
-            for(auto i: c[_c].s)
-            {
-                ans += g.prf[_t][i];
-            }
         }
         cout<<el<<el;
     }
-    cout<<el<<el<<"Answer is: "<<ans<<el;
-    cout<<"Solve in "<<double(clock()-BeginTime)/double(CLOCKS_PER_SEC)<<"s.";
 }
 
 signed main()

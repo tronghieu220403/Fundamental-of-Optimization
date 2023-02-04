@@ -90,6 +90,9 @@ def check(fileOut,fileIn = "data.inp"):
     finp = open(fileOut,"r")
     if ("o s" in finp.readline()):
         return -1
+    for _ in range(3):
+        finp.readline()
+
     x = CP(fileIn)
     StuData, PrfData = x.ReadInput()
     e, f = x.GetValue("minMatchStu"),x.GetValue("minMachProf")

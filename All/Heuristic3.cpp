@@ -787,7 +787,7 @@ int solve(int e, int f)
 
                 /*
                 nis[_c] (short for number of intersection of student):
-                number of student in both 
+                number of student in both
                 c[_c].ps: potential student of council _c
                 t[_t].s: potential student of teacher _t
                 */
@@ -799,7 +799,7 @@ int solve(int e, int f)
                 else if(sum_ct[_c][_t]==sum_ct[bc][_t]) // if equally match
                 {
                     // if greater number of intersection of student -> update
-                    if(nit[_c]<nit[bc]) 
+                    if(nit[_c]<nit[bc])
                     {
                         bc = _c;
                     }
@@ -849,7 +849,7 @@ int solve(int e, int f)
             {
                 // If that council is full of students, ignore
                 if(c[_c].s.size()==g.maxStu) continue;
-                
+
                 // Check if this student can not match with anyone in this council
                 int check = 1;
                 for(auto j: c[_c].s)
@@ -872,7 +872,7 @@ int solve(int e, int f)
 
                 /*
                 nis[_c] (short for number of intersection of student):
-                number of student in both 
+                number of student in both
                 c[_c].ps: potential student list of council _c
                 s[i].s: potential student list of student i
                 */
@@ -880,7 +880,7 @@ int solve(int e, int f)
 
                 /*
                 nit[_c] (short for number of intersection of teacher):
-                number of teacher in both 
+                number of teacher in both
                 c[_c].pt: potential teacher list of council _c
                 s[i].t: potential teacher list of student i
                 */
@@ -908,7 +908,7 @@ int solve(int e, int f)
             {
                 return 0;
             }
-            
+
             c[bc].s.push_back(i); // add student i into council _t
 
             // update total match of all students to council bc
@@ -922,7 +922,7 @@ int solve(int e, int f)
                 sum_ct[bc][_t] += g.prf[_t][i];
             }
             //
-            
+
             // remove i out of potential student list in all councils
             for(int _c=1;_c<=g.nC;_c++)
             {
@@ -990,7 +990,7 @@ void input()
     int ans = 0;
 
     int TeacherAns[1100], StudentAns[1100];
-    
+
     for(int _c=1;_c<=g.nC;_c++)
     {
         for(auto i: c[_c].s)

@@ -1,5 +1,5 @@
 from random import *
-from Project26Ex import CP
+from Project26Ex import CP, CheckHeuristic
 def r(x,y=0):
     if y>x:
         x,y = y,x
@@ -15,6 +15,7 @@ import os
 
 finp = 0#open("HeuristicAns.out","r")
 
+'''
 def read():
     global finp
     while True:
@@ -22,7 +23,7 @@ def read():
         if "No" in xx:
             print("No solution.")
             #exit()
-        if len(xx) == 1 or "C" in xx or ":" in xx:
+        if len(xx) == 1 or "C" in xx or ":" in xx or "i" in xx:
             continue
         return list(map(int, xx.split()))
 
@@ -89,6 +90,8 @@ def check(fileOut,fileIn = "data.inp"):
     finp = open(fileOut,"r")
     if ("o s" in finp.readline()):
         return -1
+    for _ in range(3):
+        finp.readline()
     x = CP(fileIn)
     StuData, PrfData = x.ReadInput()
     e, f = x.GetValue("minMatchStu"),x.GetValue("minMachProf")
@@ -108,12 +111,14 @@ def check(fileOut,fileIn = "data.inp"):
                 if i!=j:
                     ans += StuData[i-1][j-1]
                     if StuData[i-1][j-1] < e:
+                        finp.close()
                         raise ValueError(f'Wrong in StuData: {i} {j}: {StuData[i-1][j-1]} < {e}')
             for t in Prf:
-                ans+= PrfData[i-1][j-1]
+                ans+= PrfData[t-1][i-1]
                 if PrfData[t-1][i-1] < f:
+                    finp.close()
                     raise ValueError(f'Wrong in PrfData: {t} {i}: {PrfData[t-1][i-1]} < {f}')
-    #finp.close()
+    finp.close()
     for i in range(nCouncil):
         for j in range(i+1,nCouncil):
             if len(set(StuData1[i]).intersection(set(StuData1[j]))) != 0:
@@ -142,15 +147,15 @@ def CheckOnly(_N,_M,x=0,fileOut = "",fileIn = "data.inp"):
     ans3 = 0
     if x==1:
         BeginTime = time.time()
-        os.system("Heuristic.exe")  #write answer to HeuristicAns.out
+        os.system("Heuristic.exe")           #write answer to HeuristicAns.out
         os.system("Heuristic1.exe")          #write answer to HeuristicAns1.out
         os.system("Heuristic3.exe")          #write answer to HeuristicAns3.out
         #print(f"Solve in {time.time()-BeginTime}s.")
         if _N*(_N+_M) <= 150*300:
             os.popen("python HeuristicSolverForSmallData.py").read()   #write answer to HeuristicAns2.out
             ans3 = get_ans("HeuristicAns2.out")
-    #ans1 = check(fileOut,fileIn)
-    #ans2 = check("HeuristicAns1.out",fileIn)
+            if check("HeuristicAns3.out") == False:
+                print("HeuristicSolverForSmallData.py wrong answer.")
     ans1 = get_ans("HeuristicAns.out")
     ans2 = get_ans("HeuristicAns1.out")
     ans4 = get_ans("HeuristicAns3.out")
@@ -170,6 +175,12 @@ def CheckOnly(_N,_M,x=0,fileOut = "",fileIn = "data.inp"):
         print("Answer in HeuristicAns2.out")
     elif ans4 == max([ans1,ans2,ans3,ans4]):
         print("Answer in HeuristicAns3.out")
+    if check("HeuristicAns.out") == False:
+        print("Heuristic.exe wrong answer.")
+    if check("HeuristicAns1.out") == False:
+        print("Heuristic.exe wrong answer.")
+    if check("HeuristicAns3.out") == False:
+        print("Heuristic.exe wrong answer.")
 
 
 #Generate input to data.inp and check the result.
@@ -177,10 +188,12 @@ Test = 1
 for _ in range(Test):
     print("Test case "+str(_))
     _N = 1000
-    _M = 1000
-    _K = r(50,70)
+    _M = 200
+    _K = r(15,20)
     T = 0
     while(T):
         if Generate(_N,_M,_K)==1:
             break
-    #CheckOnly(_N,_M,1) #if you already have an input file "data.inp", you can check your code with that test case by using this.
+    CheckOnly(_N,_M,1) #if you already have an input file "data.inp", you can check your code with that test case by using this.
+'''
+CheckHeuristic(0)

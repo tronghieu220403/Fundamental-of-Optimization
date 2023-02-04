@@ -156,7 +156,25 @@ def w(x="",end='\n'):
 
 ans = 0
 
+StudentAns = [0 for i in range(nStu)]
+TeacherAns = [0 for i in range(nProf)]
 
+for b in range(nCouncil):
+    for i in table[b][0]:
+        StudentAns[i] = b
+    for t in table[b][1]:
+        TeacherAns[t] = b
+        
+w(nStu)
+for i in range(nStu):
+    w(StudentAns[i]+1,end = " ")
+w()
+w(nProf)
+for t in range(nProf):
+    w(TeacherAns[t]+1,end = " ")
+
+w()
+w()
 for b in range(nCouncil):
     w(f"Council {b+1}:")
     w(f"{len(table[b][0])} project:")

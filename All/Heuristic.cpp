@@ -187,7 +187,7 @@ int solve(int e, int f)
     fill(TeacherSelected,TeacherSelected+1050,0);
     int ps_sz; //potential student size
     int pt_sz; //potential teacher size
-    
+
     for(int _c=1;_c<=g.nC;_c++)
     {
         c[_c].ps.clear();
@@ -206,7 +206,7 @@ int solve(int e, int f)
         // Now we are going to find first pair of student - teacher
 
         int mt = -1;    // mt (short for max teacher): teacher that have the most student that can be in the same council
-        // Among all teacher, choose 
+        // Among all teacher, choose
         for(int _t=1;_t<=g.nProf;_t++)
         {
             // if Teacher _t has been selected, ignore
@@ -287,9 +287,9 @@ int solve(int e, int f)
             if(TeacherSelected[now]==0)
                 trash.push_back(now);
         }
-        
-        pt.clear(); // 
-        ps.clear(); //  
+
+        pt.clear(); //
+        ps.clear(); //
         pt.resize(1100);
         memset(&pt[0],0,1100*sizeof(Node));
         pt_sz = ins(pt,trash);
@@ -651,7 +651,7 @@ void input()
                 gg = 0;
             g.prf[_t][i] = gg;
         }
-    }    
+    }
     for(int i=1;i<=g.nStu;i++)
     {
         int gg; cin>>gg;
@@ -679,6 +679,42 @@ void input()
 
     int ans = 0;
 
+    int TeacherAns[1100], StudentAns[1100];
+
+    for(int _c=1;_c<=g.nC;_c++)
+    {
+        for(auto i: c[_c].s)
+        {
+            StudentAns[i] = _c;
+            for(auto j: c[_c].s)
+            {
+                if(i!=j)
+                    ans += g.prj[i][j];
+            }
+        }
+        for(auto _t: c[_c].t)
+        {
+            TeacherAns[_t] = _c;
+            for(auto i: c[_c].s)
+            {
+                ans += g.prf[_t][i];
+            }
+        }
+    }
+
+    cout<<g.nStu<<el;
+    for (int i=1;i<=g.nStu;i++)
+    {
+        cout<<StudentAns[i]<<" ";
+    }
+    cout<<el<<g.nProf<<el;
+    for (int _t=1;_t<=g.nProf;_t++)
+    {
+        cout<<TeacherAns[_t]<<" ";
+    }
+
+    cout<<el<<el<<"Answer is: "<<ans<<el;
+    cout<<"Solve in "<<double(clock()-BeginTime)/double(CLOCKS_PER_SEC)<<"s."<<el<<el;
     for(int _c=1;_c<=g.nC;_c++)
     {
         cout<<"Council "<<_c<<":"<<el;
@@ -686,26 +722,15 @@ void input()
         for(auto i: c[_c].s)
         {
             cout<<i<<" ";
-            for(auto j: c[_c].s)
-            {
-                if(i!=j)
-                    ans += g.prj[i][j];
-            }
         }
         cout<<el;
         cout<<c[_c].t.size()<<" teacher: "<<el;
         for(auto _t: c[_c].t)
         {
             cout<<_t<<" ";
-            for(auto i: c[_c].s)
-            {
-                ans += g.prf[_t][i];
-            }
         }
         cout<<el<<el;
     }
-    cout<<el<<el<<"Answer is: "<<ans<<el;
-    cout<<"Solve in "<<double(clock()-BeginTime)/double(CLOCKS_PER_SEC)<<"s.";
 }
 
 signed main()
