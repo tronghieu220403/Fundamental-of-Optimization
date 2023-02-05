@@ -937,6 +937,126 @@ int solve(int e, int f)
     return 1;
 }
 
+int TeacherAns[1100], StudentAns[1100];
+
+clock_t BeginTime;
+
+int MaxAns = 0, _ans;
+
+// Check if we can place StudentToCheck into council _c
+bool CheckStudentToCouncil(int _c,int StudentToCheck, int StudentToSwap)
+{
+    for(auto i: c[_c].s)
+    {
+        if (i!=StudentToSwap)
+        {
+            if (g.prj[StudentToCheck][i] < g.minMatchStu || g.prj[i][StudentToCheck] < g.minMatchStu)
+                return false;
+        }
+    }
+    for(auto _t: c[_c].t)
+    {
+        if (g.prf[_t][StudentToCheck] < g.minMatchProf)
+            return false;
+    }
+    return true;
+}
+
+// Get total match point of a council
+int GetSumCouncil(int _c)
+{
+    int Ans1 = 0;
+    for (auto i: c[_c].s)
+    {
+        for (auto j: c[_c].s)
+        {
+            Ans1 += g.prj[i][j];
+        }
+        for (auto _t: c[_c].t)
+        {
+            Ans1 += g.prf[_t][i];
+        }
+    }
+    return Ans1;
+}
+
+bool CheckSumSwapStudent(int StudentA, int StudentB)
+{
+    // find place of StudentA and StudentB in his/her councils
+    int idA = 0;
+    int _cA = StudentAns[StudentA];
+    for(int i = 0;i<c[_cA].s.size();i++)
+    {
+        if (c[_cA].s[i]==StudentA)
+        {
+            idA = i;
+            break;
+        }
+    }
+    int idB = 0;
+    int _cB = StudentAns[StudentB];
+    for (int i=0;i<c[_cB].s.size();i++)
+    {
+        if (c[_cB].s[i]==StudentB)
+        {
+            idB = i;
+            break;
+        }
+    }
+
+    //Calculate old sum
+    int OldSum = GetSumCouncil(_cA) + GetSumCouncil(_cB);
+
+    // Swap StudentA ans StudentB
+    swap(c[_cA].s[idA], c[_cB].s[idB]);
+    swap(StudentAns[StudentA],StudentAns[StudentB]);
+    //Calculate new sum
+    int NewSum = GetSumCouncil(_cA) + GetSumCouncil(_cB);
+
+    if (OldSum>=NewSum) // if NewSum less than OldSum, swap back
+    {
+        swap(StudentAns[StudentA],StudentAns[StudentB]);
+        swap(c[_cA].s[idA], c[_cB].s[idB]);
+        return false;
+    }
+    else
+        return true;
+}
+
+int GetRunTime()
+{
+    return double(clock()-BeginTime)/double(CLOCKS_PER_SEC);
+}
+
+void HillClimbing()
+{
+    bool check = 1;
+    while(GetRunTime()<double(10.0))
+    {
+        for (int i=1;i<=g.nStu;i++)
+        {
+            for (int j=1;j<=g.nStu;j++)
+            {
+                // if they are not in the same council
+                if (StudentAns[i]!=StudentAns[j])
+                {
+                    // check if both of them can swap council
+                    if (CheckStudentToCouncil(StudentAns[i],j,i) == false || CheckStudentToCouncil(StudentAns[j],i,j) == false)
+                        continue;
+                    // Try to swap
+                    if (CheckSumSwapStudent(i,j))
+                    {
+                        check = 1;
+                    }
+                    if(GetRunTime()>double(10.0))
+                        return;
+                }
+            }
+        }
+        if (check==0) break;
+    }
+}
+
 void input()
 {
     cin>>g.nStu>>g.nProf>>g.nC;
@@ -982,16 +1102,26 @@ void input()
             }
         }
     }
-    clock_t BeginTime = clock();
+    BeginTime = clock();
     if(solve(g.minMatchStu,g.minMatchProf)==0)
     {
         cout<<"No solution"<<el;
         exit(0);
     }
 
-    int ans = 0;
+    for(int _c=1;_c<=g.nC;_c++)
+    {
+        for(auto i: c[_c].s)
+        {
+            StudentAns[i] = _c;
+        }
+        for(auto _t: c[_c].t)
+        {
+            TeacherAns[_t] = _c;
+        }
+    }
 
-    int TeacherAns[1100], StudentAns[1100];
+    HillClimbing();
 
     for(int _c=1;_c<=g.nC;_c++)
     {
@@ -1001,7 +1131,7 @@ void input()
             for(auto j: c[_c].s)
             {
                 if(i!=j)
-                    ans += g.prj[i][j];
+                    MaxAns += g.prj[i][j];
             }
         }
         for(auto _t: c[_c].t)
@@ -1009,7 +1139,7 @@ void input()
             TeacherAns[_t] = _c;
             for(auto i: c[_c].s)
             {
-                ans += g.prf[_t][i];
+                MaxAns += g.prf[_t][i];
             }
         }
     }
@@ -1025,7 +1155,7 @@ void input()
         cout<<TeacherAns[_t]<<" ";
     }
 
-    cout<<el<<el<<"Answer is: "<<ans<<el;
+    cout<<el<<el<<"Answer is: "<<MaxAns<<el;
     cout<<"Solve in "<<double(clock()-BeginTime)/double(CLOCKS_PER_SEC)<<"s."<<el<<el;
     for(int _c=1;_c<=g.nC;_c++)
     {
