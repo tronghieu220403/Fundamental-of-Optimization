@@ -170,7 +170,7 @@ int solve(int e, int f)
     {
         for (int i=1;i<=g.nStu;i++)
         {
-            // if student i and teacher t have a possibility to be in a same group
+            // if student i and teacher _t have a possibility to be in a same group
             if (g.prf[_t][i]>=g.minMatchProf)
             {
                 StudentList.push_back(i);
@@ -189,8 +189,8 @@ int solve(int e, int f)
     // TeacherSelected[_t] = 1 means that teacher _t was selected
     fill(StudentSelected,StudentSelected+1050,0);
     fill(TeacherSelected,TeacherSelected+1050,0);
-    int ps_sz; //potential student size
-    int pt_sz; //potential teacher size
+    int ps_sz = 0; //potential student size
+    int pt_sz = 0; //potential teacher size
 
     for(int _c=1;_c<=g.nC;_c++)
     {
@@ -249,10 +249,10 @@ int solve(int e, int f)
             Iterate all teacher _t that satisfy:
             the number of student that teacher _t can NOW connect greater or equal
             than the minimun of number of students in a council.
-            Among that teacher, we choose teacher with highest potentail sum (pts_t[])
-            If many has equal highest potentail sum,
-            choose teacher with highest potential connection among them
-            (purpose: highest potential connection can bring more member to that council)
+            Among that teacher, we choose teacher with greatest potentail sum (pts_t[])
+            If many has equal greatest potentail sum,
+            choose teacher with greatest potential connection among them
+            (purpose: greatest potential connection can bring more member to that council)
             */
             if (t[_t].ssz>= g.minStu)
             {
@@ -262,10 +262,10 @@ int solve(int e, int f)
                 }
                 else if(pts_t[_t]==pts_t[bt])  // if equally potential sum
                 {
-                    if(t[_t].ssz>t[bt].ssz) // if higher connection -> update
+                    if(t[_t].ssz>t[bt].ssz) // if greater connection -> update
                         bt = _t;
                 }
-                else if(pts_t[_t]>pts_t[bt]) // if higher potential sum -> update
+                else if(pts_t[_t]>pts_t[bt]) // if greater potential sum -> update
                 {
                     bt = _t;
                 }
@@ -279,7 +279,7 @@ int solve(int e, int f)
         TeacherSelected[bt] = 1; // mark this teacher bt was selected
         c[_c].t.push_back(bt); // add this teacher into council _c
 
-        // remove this teacher in all of the student potential sum
+        // remove this teacher from all of the student potential sum
         for(int i = 1; i<=g.nStu;i++)
         {
             if (g.prf[bt][i]>=g.minMatchProf)
@@ -325,7 +325,7 @@ int solve(int e, int f)
             /*
             Iterate all student _s that satisfy:
             +) The number of student that student _s can NOW connect greater or equal
-            than the minimun of number of students in a council.
+            than the minimun of number of students in a council minus 1 (himself/herself).
             +) The number of teacher that student _s can NOW connect greater or equal
             than the minimun of number of teachers in a council.
             Among that student, we choose student with highest potentail sum: pts_s()
@@ -342,12 +342,12 @@ int solve(int e, int f)
                 }
                 else if(pts_s[_s]==pts_s[bs]) // if equally potential sum
                 {
-                    if(s[_s].tsz+s[_s].ssz>s[bs].tsz+s[bs].ssz) // if higher connection -> update
+                    if(s[_s].tsz+s[_s].ssz>s[bs].tsz+s[bs].ssz) // if greater connection -> update
                     {
                         bs = _s;
                     }
                 }
-                else if(pts_s[_s]>pts_s[bs]) // if higher potential sum -> update
+                else if(pts_s[_s]>pts_s[bs]) // if greater potential sum -> update
                 {
                     bs = _s;
                 }
@@ -359,8 +359,9 @@ int solve(int e, int f)
         {
             return 0;
         }
-        StudentSelected[bs] = 1;
-        c[_c].s.push_back(bs);
+
+        StudentSelected[bs] = 1; // mark this student bs was selected
+        c[_c].s.push_back(bs); // add this student into council _c
 
         // remove that student in all of the student potential sum
         for(int i = 1; i<=g.nStu;i++)
@@ -582,6 +583,7 @@ int solve(int e, int f)
 
                 StudentSelected[bs] = 1;
             }
+
             int bt = -1;
             /*
             bt (short for best teacher): teacher that have the greatest potential sum
@@ -632,7 +634,7 @@ int solve(int e, int f)
                     if(ps_tts[_t] + cs_size <g.minStu)
                         continue;
 
-                    // we will choose student with greatest potential sum
+                    // we will choose student with greatest potential connection
                     if(bt==-1)
                     {
                         bt = _t;
@@ -829,7 +831,7 @@ int solve(int e, int f)
             {
                 c[_c].pt_sz -= del(c[_c].pt,_t);
             }
-            TeacherSelected[_t] = 1;
+            TeacherSelected[_t] = 1; // mark teacher _t as selected
         }
     }
 
@@ -1048,7 +1050,7 @@ signed main()
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     freopen("data.inp","r",stdin);
-    freopen("HeuristicAns3.out","w",stdout);
+    freopen("HeuristicAns.out","w",stdout);
     int test = 1;
     //cin>>test;
     while(test--)

@@ -1,2 +1,2 @@
 from Project26Ex import CheckHeuristic
-CheckHeuristic(0)
+CheckHeuristic(1,1,20,10,5)
