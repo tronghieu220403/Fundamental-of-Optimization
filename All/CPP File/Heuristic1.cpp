@@ -1023,9 +1023,9 @@ int GetRunTime()
 
 void HillClimbing()
 {
-    bool check = 1;
     while(GetRunTime()<double(10.0))
     {
+        bool check = 1;
         for (int i=1;i<=g.nStu;i++)
         {
             for (int j=1;j<=g.nStu;j++)
