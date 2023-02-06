@@ -77,7 +77,7 @@ struct info
 
 info g;
 
-//double dll list
+//double linked list
 struct dll
 {
     vector<Node> s;
@@ -86,8 +86,6 @@ struct dll
 };
 
 dll t[1104],s[1104];
-
-clock_t TotalTime = 0;
 
 int intersection(vector<Node> &p,vector<Node> &pa)
 {
@@ -142,45 +140,45 @@ int solve(int e, int f)
     /*
     Setting up double linked list for s[i].s, s[i].t, t[_t].s
     */
-    vector<int> Studentlist,Teacherlist;
+    vector<int> StudentList,TeacherList;
     for(int i=1;i<=g.nStu;i++)
     {
         for(int j=1;j<=g.nStu;j++)
         {
-            // if student i and student j have a possibinity to be in a same group
+            // if student i and student j have a possibility to be in a same group
             if (g.prj[i][j]>=g.minMatchStu && g.prj[j][i]>=g.minMatchStu)
             {
-                Studentlist.push_back(j);
+                StudentList.push_back(j);
             }
         }
-        // s[i].s: list of potential student that can be in same council with student i
-        s[i].ssz = ins(s[i].s,Studentlist);
+        // s[i].s: List of potential student that can be in same council with student i
+        s[i].ssz = ins(s[i].s,StudentList);
         for (int _t=1;_t<=g.nProf;_t++)
         {
-            // if student i and teacher t have a possibinity to be in a same group
+            // if student i and teacher t have a possibility to be in a same group
             if (g.prf[_t][i]>=g.minMatchProf)
             {
-                Teacherlist.push_back(_t);
+                TeacherList.push_back(_t);
             }
         }
-        //s[i].t: list of potential teacher that can be in same council with student i
-        s[i].tsz = ins(s[i].t,Teacherlist);
-        Teacherlist.clear();
-        Studentlist.clear();
+        //s[i].t: List of potential teacher that can be in same council with student i
+        s[i].tsz = ins(s[i].t,TeacherList);
+        TeacherList.clear();
+        StudentList.clear();
     }
     for (int _t=1;_t<=g.nProf;_t++)
     {
         for (int i=1;i<=g.nStu;i++)
         {
-            // if student i and teacher _t have a possibinity to be in a same group
+            // if student i and teacher _t have a possibility to be in a same group
             if (g.prf[_t][i]>=g.minMatchProf)
             {
-                Studentlist.push_back(i);
+                StudentList.push_back(i);
             }
         }
-        //t[_t].s: list of potential student that can be in same council with teacher _t
-        t[_t].ssz = ins(t[_t].s,Studentlist);
-        Studentlist.clear();
+        //t[_t].s: List of potential student that can be in same council with teacher _t
+        t[_t].ssz = ins(t[_t].s,StudentList);
+        StudentList.clear();
     }
 
     //set up data
@@ -246,27 +244,28 @@ int solve(int e, int f)
         {
             // if Teacher _t has been selected, ignore
             if(TeacherSelected[_t]==(ll)(1)) continue;
+
             /*
             Iterate all teacher _t that satisfy:
             the number of student that teacher _t can NOW connect greater or equal
             than the minimun of number of students in a council.
-            Among that teacher, we choose teacher with greatest potential connection (t[].ssz)
-            If many has equal greatest potential connection,
-            choose teacher with greatest potentail sum among them
+            Among that teacher, we choose teacher with greatest potentail sum (pts_t[])
+            If many has equal greatest potentail sum,
+            choose teacher with greatest potential connection among them
+            (purpose: greatest potential connection can bring more member to that council)
             */
-
             if (t[_t].ssz>= g.minStu)
             {
                 if(bt==-1) // if no teacher was choosen -> choose that teacher
                 {
                     bt = _t;
                 }
-                else if(t[_t].ssz==t[bt].ssz) // if equally potential connection
+                else if(pts_t[_t]==pts_t[bt])  // if equally potential sum
                 {
-                    if(pts_t[_t]>pts_t[bt]) // if greater potential sum -> update
+                    if(t[_t].ssz>t[bt].ssz) // if greater connection -> update
                         bt = _t;
                 }
-                else if(t[_t].ssz>t[bt].ssz) // if greater potential connection -> update
+                else if(pts_t[_t]>pts_t[bt]) // if greater potential sum -> update
                 {
                     bt = _t;
                 }
@@ -293,21 +292,21 @@ int solve(int e, int f)
         -> The set of students that can be placed in this council is a subset
         of the set of students that teacher bt can connect.
         */
-        vector<int> Studentlist;
+        vector<int> StudentList;
         int now = 0;
         while(t[bt].s[now].next!=1004&&t[bt].s[now].next!=0)
         {
             now = t[bt].s[now].next;
             if(StudentSelected[now]==0)
-                Studentlist.push_back(now);
+                StudentList.push_back(now);
         }
 
         // set up ps: students that council _c can connect
         ps.clear();
         ps.resize(1100);
         memset(&ps[0],0,1100*sizeof(Node));
-        ps_sz = ins(ps,Studentlist);
-        Studentlist.clear();
+        ps_sz = ins(ps,StudentList);
+        StudentList.clear();
         //end set up ps
 
         int bs = -1;
@@ -329,26 +328,26 @@ int solve(int e, int f)
             than the minimun of number of students in a council minus 1 (himself/herself).
             +) The number of teacher that student _s can NOW connect greater or equal
             than the minimun of number of teachers in a council.
-            Among that student, we choose student with highest potentail connection, i.e. maximize(s[_s].tsz+s[_s].ssz)
-            If many has equal highest potentail connection,
-            choose student with highest potential sum among them
-            (i.e. pts_s())
+            Among that student, we choose student with highest potentail sum: pts_s()
+            If many has equal highest potentail sum,
+            choose student with highest potential connection among them
+            (i.e. s[_s].tsz+s[_s].ssz)
+            (purpose: highest potential connection can bring more member to that council)
             */
-
             if(s[_s].tsz>=g.minProf&&s[_s].ssz>=g.minStu-1)
             {
                 if(bs==-1) // if no student was choosen -> choose that teacher
                 {
                     bs = _s;
                 }
-                else if(s[_s].tsz+s[_s].ssz==s[bs].tsz+s[bs].ssz) // if equally connection
+                else if(pts_s[_s]==pts_s[bs]) // if equally potential sum
                 {
-                    if(pts_s[_s]>pts_s[bs]) // if greater potential sum -> update
+                    if(s[_s].tsz+s[_s].ssz>s[bs].tsz+s[bs].ssz) // if greater connection -> update
                     {
                         bs = _s;
                     }
                 }
-                else if(s[_s].tsz+s[_s].ssz>s[bs].tsz+s[bs].ssz) // if greater connection -> update
+                else if(pts_s[_s]>pts_s[bs]) // if greater potential sum -> update
                 {
                     bs = _s;
                 }
@@ -360,6 +359,7 @@ int solve(int e, int f)
         {
             return 0;
         }
+
         StudentSelected[bs] = 1; // mark this student bs was selected
         c[_c].s.push_back(bs); // add this student into council _c
 
@@ -382,22 +382,22 @@ int solve(int e, int f)
         -> The set of teachers that can be placed in this council is
         the set of teachers that student bs can connect.
         */
-        vector<int> Teacherlist;
-        Teacherlist.clear();
+        vector<int> TeacherList;
+        TeacherList.clear();
         now = 0;
         while(s[bs].t[now].next!=1004&&s[bs].t[now].next!=0)
         {
             now = s[bs].t[now].next;
             if(TeacherSelected[now]==0)
-                Teacherlist.push_back(now);
+                TeacherList.push_back(now);
         }
 
         //set up pt: teacher thats council _c can connect
         pt.clear();
         pt.resize(1100);
         memset(&pt[0],0,1100*sizeof(Node));
-        pt_sz = ins(pt,Teacherlist);
-        Teacherlist.clear();
+        pt_sz = ins(pt,TeacherList);
+        TeacherList.clear();
         //end set up pt
 
         // remove bs out of ps (bs was choosen -> bs is no more potential)
@@ -407,12 +407,11 @@ int solve(int e, int f)
 
         /*
         Remove bs out of all:
-        +) s[i].s (list of potential student that can be in same council with teacher _t)
-        +) t[_t].s (list of potential student that can be in same council with teacher _t)
+        +) s[i].s (List of potential student that can be in same council with teacher _t)
+        +) t[_t].s (List of potential student that can be in same council with teacher _t)
         Remove bt out of all:
-        +) s[i].t (list of potential teacher that can be in same council with student i)
+        +) s[i].t (List of potential teacher that can be in same council with student i)
         */
-
         for(int i=1;i<=g.nStu;i++)
         {
             s[i].ssz-=del(s[i].s,bs);
@@ -466,8 +465,8 @@ int solve(int e, int f)
 
             int bs = -1;
             /*
-            bs (short for best student): student that have the greatest potential connection
-            i.e. ps_sis[bs]+pt_sit[bs] = max(ps_sis[]+pt_sit[])
+            bs (short for best student): student that have the greatest potential sum
+            i.e. pts_t[bs] = max(pts_s)
             */
             if (cs_size < g.minStu) // if not enough minimun student in this council
             {
@@ -522,19 +521,19 @@ int solve(int e, int f)
                     if(pt_sit[i] + ct_size < g.minProf)
                         continue;
 
-                    // we will choose student with greatest potential connection
+                    // we will choose student with greatest potential sum
                     if(bs==-1)
                     {
                         bs = i;
                     }
-                    else if(ps_sis[i]+pt_sit[i]==ps_sis[bs]+pt_sit[bs])
+                    else if(pts_s[i]==pts_s[bs])
                     {
-                        if(pts_s[i]>pts_s[bs])
+                        if(ps_sis[i]+pt_sit[i]>ps_sis[bs]+pt_sit[bs])
                         {
                             bs = i;
                         }
                     }
-                    else if(ps_sis[i]+pt_sit[i]>ps_sis[bs]+pt_sit[bs])
+                    else if(pts_s[i]>pts_s[bs])
                     {
                         bs = i;
                     }
@@ -546,16 +545,22 @@ int solve(int e, int f)
                 c[_c].s.push_back(bs); // add this student into council _c
 
                 // remove this student from all of the student potential sum
-                ps_sz -= del(ps,bs);
                 for(int i = 1; i<=g.nStu;i++)
                 {
-                    pts_s[i] -= g.prj[i][bs];
+                    if(g.prj[i][bs]>=g.minMatchStu&&g.prj[bs][i]>=g.minMatchStu)
+                        pts_s[i] -= g.prj[i][bs] + g.prj[bs][i];
                 }
+                // remove this student from all of the teacher potential sum
                 for(int _t = 1; _t<=g.nProf;_t++)
                 {
-                    pts_t[_t] -= g.prf[_t][bs];
+                    if(g.prf[_t][bs]>=g.minMatchProf)
+                        pts_t[_t] -= g.prf[_t][bs];
                 }
+                //
 
+                // remove this student out of all potential list
+                del(ps,bs);
+                ps_sz--;
                 for(int i=1;i<=g.nStu;i++)
                 {
                     if(del(s[i].s,bs)==1)
@@ -576,14 +581,15 @@ int solve(int e, int f)
                 s[bs].t.clear();
                 //
 
-                StudentSelected[bs] = 1; // mark this student bs was selected
-
+                StudentSelected[bs] = 1;
             }
+
             int bt = -1;
             /*
-            bt (short for best teacher): teacher that have the greatest potential connection
+            bt (short for best teacher): teacher that have the greatest potential sum
             i.e. pts_t[bt] =max(pts_t)
             */
+
             if( ct_size < g.minProf) // if not enough minimun student in this council
             {
                 action++;
@@ -633,17 +639,18 @@ int solve(int e, int f)
                     {
                         bt = _t;
                     }
-                    else if (ps_tts[_t]==ps_tts[bt])
+                    else if (pts_t[_t]==pts_t[bt])
                     {
-                        if (pts_t[_t]>pts_t[bt])
+                        if (ps_tts[_t]>ps_tts[bt])
                         {
                             bt = _t;
                         }
                     }
-                    else if (ps_tts[_t]>ps_tts[bt])
+                    else if (pts_t[_t]>pts_t[bt])
                     {
                         bt = _t;
                     }
+                    //
                 }
 
                 if(bt==-1) // if can not choose any teacher -> no solution
@@ -674,7 +681,6 @@ int solve(int e, int f)
 
                 TeacherSelected[bt] = 1;
             }
-
             if (action==0) // if no teacher and student was choosen in this loop -> end loop
             // -> number of student in this council NOW = minStu
             // -> number of teacher in this council NOW = minProf
@@ -683,22 +689,22 @@ int solve(int e, int f)
 
         // save remain ps and pt of council _c to c[_c].ps and c[_c].pt
         now = 0;
-        Studentlist.clear();
+        StudentList.clear();
         while(ps[now].next!=1004&&ps[now].next!=0)
         {
             now = ps[now].next;
-            Studentlist.push_back(now);
+            StudentList.push_back(now);
         }
-        c[_c].ps_sz = ins(c[_c].ps,Studentlist);
-        Teacherlist.clear();
+        c[_c].ps_sz = ins(c[_c].ps,StudentList);
+        TeacherList.clear();
         now = 0;
         while(pt[now].next!=1004&&pt[now].next!=0)
         {
             now = pt[now].next;
-            Teacherlist.push_back(now);
+            TeacherList.push_back(now);
         }
-        c[_c].pt_sz = ins(c[_c].pt,Teacherlist);
-        Teacherlist.clear();
+        c[_c].pt_sz = ins(c[_c].pt,TeacherList);
+        TeacherList.clear();
     }
 
     // delete all selected student from all council potential student
@@ -751,7 +757,6 @@ int solve(int e, int f)
     }
     //*/
 
-
     int nit[1100],nis[1100];
 
     // Assign all remain teachers into councils
@@ -763,9 +768,8 @@ int solve(int e, int f)
 
             /*
             Now we will find the best council bc for teacher _t
-            The idea is place that teacher into a council that can create
-            a maximum potential connection for that council than put him/her in others.
-            i.e. greatest nis[_c] = max(nis[])
+            The idea is place that teacher into a council that match he/she best
+            i.e. greatest sum_ct[bc][_t] = max(sum_ct[][_t])
             */
             for(int _c=1;_c<=g.nC;_c++)
             {
@@ -790,20 +794,19 @@ int solve(int e, int f)
                 t[_t].s: potential student of teacher _t
                 */
                 nis[_c] = intersection(c[_c].ps,t[_t].s);
-                if(bc==-1)
+                if(bc==-1) // if no teacher was choosen -> choose that teacher
                 {
                     bc=_c;
                 }
-                ///*
-                else if(nit[_c]==nit[bc])
+                else if(sum_ct[_c][_t]==sum_ct[bc][_t]) // if equally match
                 {
-                    if(sum_ct[_c][_t]>sum_ct[bc][_t])
+                    // if greater number of intersection of student -> update
+                    if(nit[_c]<nit[bc])
                     {
                         bc = _c;
                     }
                 }
-                //*/
-                else if(nit[_c]<nit[bc])
+                else if(sum_ct[_c][_t]>sum_ct[bc][_t]) // if greater match -> update
                 {
                     bc = _c;
                 }
@@ -841,9 +844,8 @@ int solve(int e, int f)
 
             /*
             Now we will find the best council bc for student i
-            The idea is place that student into a council that can create
-            a maximum potential connection for that council than put him/her in another.
-            i.e. greatest nis[_c]+nit[_c] = max(nis[]+nit[])
+            The idea is place that student into a council that match he/she best
+            i.e. greatest sum_cs[i][_t] = max(sum_cs[][_t])
             */
             for(int _c=1;_c<=g.nC;_c++)
             {
@@ -877,6 +879,7 @@ int solve(int e, int f)
                 s[i].s: potential student list of student i
                 */
                 nis[_c] = intersection(c[_c].ps,s[i].s);
+
                 /*
                 nit[_c] (short for number of intersection of teacher):
                 number of teacher in both
@@ -884,18 +887,20 @@ int solve(int e, int f)
                 s[i].t: potential teacher list of student i
                 */
                 nit[_c] = intersection(c[_c].pt,s[i].t);
-                if(bc==-1)
+
+                if(bc==-1) // if no student was choosen -> choose that student
                 {
                     bc = _c;
                 }
-                else if (nis[_c]+nit[_c]==nis[bc]+nit[bc])
+                else if(sum_cs[_c][i]==sum_cs[bc][i]) // if equally match
                 {
-                    if(sum_cs[_c][i]>sum_cs[bc][i])
+                    // if greater number of intersection of student and teacher -> update
+                    if (nis[_c]+nit[_c]<nis[bc]+nit[bc])
                     {
                         bc = _c;
                     }
                 }
-                else if (nis[_c]+nit[_c]<nis[bc]+nit[bc])
+                else if(sum_cs[_c][i]>sum_cs[bc][i]) // if greater match -> update
                 {
                     bc = _c;
                 }
@@ -926,10 +931,12 @@ int solve(int e, int f)
                 c[_c].ps_sz -= del(c[_c].ps,i);
             }
             StudentSelected[i] = 1;
-        }    }
+        }
+    }
 
     return 1;
 }
+
 int TeacherAns[1100], StudentAns[1100];
 
 clock_t BeginTime;
@@ -1018,76 +1025,11 @@ int GetRunTime()
     return double(clock()-BeginTime)/double(CLOCKS_PER_SEC);
 }
 
-bool CheckTeacherToCouncil(int _c,int TargetTeacher)
-{
-    for(auto i: c[_c].s)
-    {
-        if (g.prf[TargetTeacher][i] < g.minMatchProf)
-            return false;
-    }
-    return true;
-}
-
-int GetSumTeacherCouncil(int _c, int TargetTeacher)
-{
-    int Ans1 = 0;
-    for (auto i: c[_c].s)
-    {
-        Ans1 += g.prf[TargetTeacher][i];
-    }
-    return Ans1;
-}
-
-bool CheckSumSwapTeacher(int TeacherA, int TeacherB)
-{
-    // find place of StudentA and StudentB in his/her councils
-    int idA = 0;
-    int _cA = TeacherAns[TeacherA];
-    for(int _t = 0;_t < c[_cA].t.size();_t++)
-    {
-        if (c[_cA].t[_t]==TeacherA)
-        {
-            idA = _t;
-            break;
-        }
-    }
-    int idB = 0;
-    int _cB = TeacherAns[TeacherB];
-    for (int _t=0;_t < c[_cB].t.size();_t++)
-    {
-        if (c[_cB].t[_t]==TeacherB)
-        {
-            idB = _t;
-            break;
-        }
-    }
-
-    //Calculate old sum
-    int OldSum = GetSumTeacherCouncil(_cA,TeacherA) + GetSumTeacherCouncil(_cB,TeacherB);
-
-    // Swap TeacherA ans TeacherB
-    swap(c[_cA].t[idA], c[_cB].t[idB]);
-    swap(TeacherAns[TeacherA],TeacherAns[TeacherB]);
-    //Calculate new sum
-    int NewSum = GetSumTeacherCouncil(_cA,TeacherB) + GetSumTeacherCouncil(_cB,TeacherA);
-
-    if (OldSum>=NewSum) // if NewSum less than OldSum, swap back
-    {
-        swap(TeacherAns[TeacherA],TeacherAns[TeacherB]);
-        swap(c[_cA].t[idA], c[_cB].t[idB]);
-        return false;
-    }
-    else
-        return true;
-}
-
-double TimeLimit = double(20.0);
-
 void HillClimbing()
 {
-    while(GetRunTime()<TimeLimit)
+    while(GetRunTime()<double(10.0))
     {
-        bool check = 0;
+        bool check = 1;
         for (int i=1;i<=g.nStu;i++)
         {
             for (int j=1;j<=g.nStu;j++)
@@ -1101,44 +1043,21 @@ void HillClimbing()
                     // Try to swap
                     if (CheckSumSwapStudent(i,j))
                     {
-                        //cout<<i<<" "<<j<<el;
                         check = 1;
                         break;
                     }
-                    if(GetRunTime() > TimeLimit)
+                    if(GetRunTime()>double(10.0))
                         return;
                 }
             }
         }
-        if (check==1) continue;
-        check = 0;
-        for (int t1=1;t1<=g.nProf;t1++)
-        {
-            for (int t2=1;t2<=g.nProf;t2++)
-            {
-                // if they are not in the same council
-                if (TeacherAns[t1]!=TeacherAns[t2])
-                {
-                    // check if both of them can swap council
-                    if (CheckTeacherToCouncil(TeacherAns[t1],t2) == false || CheckTeacherToCouncil(TeacherAns[t2],t1) == false)
-                        continue;
-                    //Try to swap
-                    if (CheckSumSwapTeacher(t1,t2))
-                    {
-                        check = 1;
-                        break;
-                    }
-                }
-                if(GetRunTime()> TimeLimit )
-                    return;
-            }
-        }
-        if (check==0) return;
+        if (check==0) break;
     }
 }
 
 void input()
 {
+    BeginTime = clock();
     cin>>g.nStu>>g.nProf>>g.nC;
     cin>>g.minStu>>g.maxStu>>g.minProf>>g.maxProf>>g.minMatchStu>>g.minMatchProf;
     for(int i=1;i<=g.nStu;i++)
@@ -1182,7 +1101,6 @@ void input()
             }
         }
     }
-    BeginTime = clock();
     if(solve(g.minMatchStu,g.minMatchProf)==0)
     {
         cout<<"No solution"<<el;
@@ -1260,7 +1178,7 @@ signed main()
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     freopen("data.inp","r",stdin);
-    freopen("HeuristicAns1.out","w",stdout);
+    freopen("HeuristicAns3.out","w",stdout);
     int test = 1;
     //cin>>test;
     while(test--)
