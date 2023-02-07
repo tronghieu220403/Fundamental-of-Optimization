@@ -223,10 +223,10 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
     }
 
     /*
-    int pts_s[1100]; // short for potential sum of a student
+    int pts_s[1100]; // short for potential sum of a student.
     // potential sum of a student i: sum of all student and teacher
     that student i can connect with (connect with = in the same council)
-    int pts_t[1100]; // short for potentail sum of a teacher
+    int pts_t[1100]; // short for potential sum of a teacher.
     // potential sum of a teacher _t: sum of all student
     that teacher _t can connect with.
     */
@@ -1335,7 +1335,7 @@ double TimeLimit = double(20.0);
 void HillClimbing()
 {
     clock_t TimeNow = clock();
-    while(GetRunTime(TimeNow)<TimeLimit)
+    while(GetRunTime(TimeNow)<TimeLimit)// Check if we are out of time
     {
         bool check = 0;
         for (int i=1;i<=g.nStu;i++)
@@ -1349,18 +1349,18 @@ void HillClimbing()
                     if (CheckStudentToCouncil(StudentAns[i],j,i) == false || CheckStudentToCouncil(StudentAns[j],i,j) == false)
                         continue;
                     // Try to swap
-                    if (CheckSumSwapStudent(i,j))
+                    if (CheckSumSwapStudent(i,j)) // So we swapped at least a pair of students. 
                     {
-                        //cout<<i<<" "<<j<<el;
                         check = 1;
                         break;
                     }
+                    // Check if we are out of time
                     if(GetRunTime(TimeNow) > TimeLimit)
                         return;
                 }
             }
         }
-        if (check==1) continue;
+        if (check==1) continue; // if we swapped at least a pair of students before, continue to try to swap student. If we could not swap any student, try to swap teacher.
         check = 0;
         for (int t1=1;t1<=g.nProf;t1++)
         {
@@ -1373,17 +1373,18 @@ void HillClimbing()
                     if (CheckTeacherToCouncil(TeacherAns[t1],t2) == false || CheckTeacherToCouncil(TeacherAns[t2],t1) == false)
                         continue;
                     //Try to swap
-                    if (CheckSumSwapTeacher(t1,t2))
+                    if (CheckSumSwapTeacher(t1,t2)) // So we swapped at least a pair of teachers.
                     {
                         check = 1;
                         break;
                     }
                 }
+                // Check if we are out of time
                 if(GetRunTime(TimeNow) > TimeLimit )
                     return;
             }
         }
-        if (check==0) return;
+        if (check==0) return; // If we found a local optima, exit the hill climbing
     }
 }
 

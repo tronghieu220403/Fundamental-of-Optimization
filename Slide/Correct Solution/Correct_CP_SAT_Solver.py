@@ -110,22 +110,22 @@ def solve(getMax = 0):
         return
     link_cs_ct()
 
+    #set up ss: student + student
     ss = [[0 for _ in range(nStu)] for __ in range(nStu)]
     for i in range(nStu):
         for j in range(nStu):
             ss[i][j] = model.NewBoolVar(f'ss_{i}_{j}')
             model.AddMaxEquality(ss[i][j], [cs[b][i] + cs[b][j]-1 for b in range(nCouncil)])
 
-    #set up ct: council + teacher
+    #set up st: student + teacher
     st = [[0 for _ in range(nProf)] for __ in range(nStu)]
     for i in range(nStu):
         for t in range(nProf):
             st[i][t] = model.NewBoolVar(f'st_{i}_{t}')
             model.AddMaxEquality(st[i][t],[cs[b][i]+ct[b][t]-1 for b in range(nCouncil)])
 
-    #maxmatch = sum(PrjData[i][j] for j in range(nStu) for i in range(nStu)) + sum(PrfData[t][i] for i in range(nStu) for t in range(nProf)
-    #minAns = model.NewIntVar(0, , 'min_time')
-    model.Maximize(sum(ss[i][j]*PrjData[i][j] for j in range(nStu) for i in range(nStu)) + sum(st[i][t]*PrfData[t][i] for i in range(nStu) for t in range(nProf)))
+    model.Maximize(sum(ss[i][j]*PrjData[i][j] for j in range(nStu) for i in range(nStu)) 
+                   + sum(st[i][t]*PrfData[t][i] for i in range(nStu) for t in range(nProf)))
 
     solver = cp_model.CpSolver()
     
