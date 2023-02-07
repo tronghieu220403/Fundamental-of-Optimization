@@ -1,0 +1,51 @@
+50
+5 4 1 1 1 2 1 5 2 4 4 5 2 2 5 2 4 5 1 2 4 2 1 5 2 3 4 2 5 1 5 1 4 4 1 4 5 4 2 1 5 4 3 2 1 5 4 5 1 2 
+15
+5 5 2 5 1 2 1 5 4 5 3 1 4 2 1 
+
+Answer is: 1553
+Best method is: Method 7
+Solve in 0.171s.
+
+Answer for all methods: 
+Method 1: 1518
+Method 2: 1526
+Method 3: 1523
+Method 4: 1523
+Method 5: 1531
+Method 6: 1546
+Method 7: 1553
+Method 8: 1472
+
+Councils distribution for method 7:
+
+Council 1:
+12 project: 
+3 4 5 7 19 23 30 32 35 40 45 49 
+4 teacher: 
+5 7 12 15 
+
+Council 2:
+12 project: 
+6 9 13 14 16 20 22 25 28 39 44 50 
+3 teacher: 
+3 6 14 
+
+Council 3:
+2 project: 
+26 43 
+1 teacher: 
+11 
+
+Council 4:
+12 project: 
+2 10 11 17 21 27 33 34 36 38 42 47 
+2 teacher: 
+9 13 
+
+Council 5:
+12 project: 
+1 8 12 15 18 24 29 31 37 41 46 48 
+5 teacher: 
+1 2 4 8 10 
+

@@ -1,0 +1,39 @@
+50
+5 2 4 4 4 1 1 4 3 3 2 2 4 3 2 3 3 1 1 3 3 5 4 3 4 2 2 1 3 4 2 2 4 4 1 2 3 1 4 1 1 3 2 2 1 1 3 2 1 4 
+15
+1 2 4 1 1 5 1 1 3 2 2 4 2 2 4 
+
+Answer is: 1555
+Best method is: Method 1
+Solve in 0.05s.
+
+Council 1:
+12 project: 
+6 7 18 19 28 35 38 40 41 45 46 49 
+5 teacher: 
+1 4 5 7 8 
+
+Council 2:
+12 project: 
+2 11 12 15 26 27 31 32 36 43 44 48 
+5 teacher: 
+2 10 11 13 14 
+
+Council 3:
+12 project: 
+9 10 14 16 17 20 21 24 29 37 42 47 
+1 teacher: 
+9 
+
+Council 4:
+12 project: 
+3 4 5 8 13 23 25 30 33 34 39 50 
+3 teacher: 
+3 12 15 
+
+Council 5:
+2 project: 
+1 22 
+1 teacher: 
+6 
+

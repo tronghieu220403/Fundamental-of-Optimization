@@ -1,0 +1,81 @@
+100
+6 4 10 4 8 4 7 6 9 9 10 2 1 3 7 8 7 1 4 8 4 1 9 6 10 1 3 7 10 4 6 3 1 6 7 2 6 1 10 8 3 7 7 4 1 10 10 5 6 6 1 8 8 7 9 9 1 9 7 9 10 4 1 8 7 3 10 7 3 8 10 1 9 4 3 4 4 4 3 6 1 6 6 2 8 10 8 3 8 3 9 9 10 9 3 7 6 3 8 9 
+30
+6 8 7 3 2 6 3 8 3 3 3 9 2 4 4 1 10 9 7 1 10 8 5 1 4 10 9 8 4 4 
+
+Answer is: 3283
+Best method is: Method 2
+Solve in 0.631s.
+
+Answer for all methods: 
+Method 1: 3267
+Method 2: 3283
+Method 3: 3230
+Method 4: 3260
+Method 5: 3261
+Method 6: 3257
+Method 7: 3245
+Method 8: 3258
+
+Councils distribution for method 2:
+
+Council 1:
+12 project: 
+13 18 22 26 33 38 45 51 57 63 72 81 
+3 teacher: 
+16 20 24 
+
+Council 2:
+3 project: 
+12 36 84 
+2 teacher: 
+5 13 
+
+Council 3:
+12 project: 
+14 27 32 41 66 69 75 79 88 90 95 98 
+5 teacher: 
+4 7 9 10 11 
+
+Council 4:
+12 project: 
+2 4 6 19 21 30 44 62 74 76 77 78 
+5 teacher: 
+14 15 25 29 30 
+
+Council 5:
+1 project: 
+48 
+1 teacher: 
+23 
+
+Council 6:
+12 project: 
+1 8 24 31 34 37 49 50 80 82 83 97 
+2 teacher: 
+1 6 
+
+Council 7:
+12 project: 
+7 15 17 28 35 42 43 54 59 65 68 96 
+2 teacher: 
+3 19 
+
+Council 8:
+12 project: 
+5 16 20 40 52 53 64 70 85 87 89 99 
+4 teacher: 
+2 8 22 28 
+
+Council 9:
+12 project: 
+9 10 23 55 56 58 60 73 91 92 94 100 
+3 teacher: 
+12 18 27 
+
+Council 10:
+12 project: 
+3 11 25 29 39 46 47 61 67 71 86 93 
+3 teacher: 
+17 21 26 
+
