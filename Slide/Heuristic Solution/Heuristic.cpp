@@ -235,7 +235,7 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
         for(int j=1;j<=g.nStu;j++)
         {
             if(g.prj[i][j]>=g.minMatchStu&&g.prj[j][i]>=g.minMatchStu)
-                pts_s[i] += g.prj[i][j] * BSF;//= g.prj[i][j] + g.prj[j][i];
+                pts_s[i] += g.prj[i][j] * BSF;
         }
         for (int _t=1;_t<=g.nProf;_t++)
         {
@@ -444,7 +444,7 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
         for(int i = 1; i<=g.nStu;i++)
         {
             if(g.prj[i][bs]>=g.minMatchStu)//&&g.prj[bs][i]>=g.minMatchStu)
-                pts_s[i] -= g.prj[i][bs] * BSF; //-= g.prj[i][bs] + g.prj[bs][i];
+                pts_s[i] -= g.prj[i][bs] * BSF;
         }
         // remove that student in all of the teacher potential sum
         for(int _t = 1; _t<=g.nProf;_t++)
@@ -643,7 +643,7 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
                 for(int i = 1; i<=g.nStu;i++)
                 {
                     if(g.prj[i][bs]>=g.minMatchStu)//&&g.prj[bs][i]>=g.minMatchStu)
-                        pts_s[i] -= g.prj[i][bs] * BSF;//-= g.prj[i][bs] + g.prj[bs][i];
+                        pts_s[i] -= g.prj[i][bs] * BSF;
                 }
                 // remove this student from all of the teacher potential sum
                 for(int _t = 1; _t<=g.nProf;_t++)
@@ -684,24 +684,24 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
             bt (short for best teacher)
             */
 
-            if( ct_size < g.minProf) // if not enough minimun student in this council
+            if( ct_size < g.minProf) // if not enough minimun teacher in this council
             {
                 action++;
                 cs_size = c[_c].s.size();
                 int now = 0;
-                //Iterate all student in ps
+                //Iterate all teacher in pt
                 while(pt[now].next!=1004&&pt[now].next!=0)
                 {
                     int _t = pt[now].next;
                     now = pt[now].next;
                     /*
-                    There are 2 cases that make StudentChecked[i] = 1:
-                    +) Student i was choosen to this council -> No more need to iterate this student
-                    +) Student i was not match in this council -> No more need to iterate this student
+                    There are 2 cases that make TeacherChecked[_t] = 1:
+                    +) Teacher _t was choosen to this council -> No more need to iterate this teacher
+                    +) Teacher _t was not match in this council -> No more need to iterate this teacher
                     */
                     if(TeacherChecked[_t]==1) continue;
 
-                    // If student i was choosen before, ignore
+                    // If teacher _t was choosen before, ignore
                     if(TeacherSelected[_t]==1) continue;
 
                     // Begin check if this teacher can not match with anyone in this council
@@ -722,14 +722,14 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
                     }
                     // End check
 
-                    // If we add this student, the maximum student for this council
-                    // must be >= minStu and >= minProf, respectively.
-
+                    // If we add this teacher, the maximum student for this council
+                    // must be >= minStu respectively.
                     if(ps_tts[_t] + cs_size <g.minStu)
                         continue;
+                        
                     if (MethodFlag == 0 || MethodFlag == 2)
                     {
-                        // we will choose student with the greatest potential connection
+                        // we will choose teacher with the greatest potential sum
                         if(bt==-1)
                         {
                             bt = _t;
@@ -748,7 +748,7 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
                     }
                     else if (MethodFlag ==1 || MethodFlag == 3)
                     {
-                        // we will choose student with the greatest potential connection
+                        // we will choose teacher with the greatest potential connection
                         if(bt==-1)
                         {
                             bt = _t;
@@ -855,7 +855,7 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
         {
             for (auto j: c[_c].s)
             {
-                sum_cs[_c][i] += g.prj[i][j] * BSF;//+= g.prj[i][j] + g.prj[j][i];
+                sum_cs[_c][i] += g.prj[i][j] * BSF;
             }
             for (auto _t: c[_c].t)
             {
@@ -870,7 +870,7 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
             }
         }
     }
-    //*/
+    //
 
     int nit[1100],nis[1100];
 
@@ -1158,7 +1158,7 @@ int FindArbitrarySolution(int MethodFlag, int BSF)
             // update total match of all students to council bc
             for(int j = 1;j<=g.nStu;j++)
             {
-                sum_cs[bc][j] += g.prj[i][j] * BSF; //+= g.prj[i][j] + g.prj[j][i];
+                sum_cs[bc][j] += g.prj[i][j] * BSF;
             }
             // update total match of all students to council bc
             for(int _t = 1; _t<=g.nProf;_t++)
